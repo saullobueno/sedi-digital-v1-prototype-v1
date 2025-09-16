@@ -1,48 +1,48 @@
-# sedi-digital-v1-prototype-v1
+# SEDI Digital - v1 - Prototype - v1
 
 <div align="center" style="margin: 30px;">
-    <a href="https://refine.dev">
-    <img alt="refine logo" src="https://refine.ams3.cdn.digitaloceanspaces.com/readme/refine-readme-banner.png">
+    <a href="https://sedi-digital-v1-prototype-v1.vercel.app">
+    <img alt="refine logo" src="https://sedi-digital-v1-prototype-v1.vercel.app/sedi-social.jpg">
     </a>
 </div>
 <br/>
 
-This [Refine](https://github.com/refinedev/refine) project was generated with [create refine-app](https://github.com/refinedev/refine/tree/master/packages/create-refine-app).
+Este projeto [Refine] (https://github.com/refinedev/refine) foi gerado com [Create Refine-App] (https://github.com/refinedev/refine/tree/master/packages/create-refine-app).
 
 ## Getting Started
 
-A React Framework for building internal tools, admin panels, dashboards & B2B apps with unmatched flexibility ✨
+Uma estrutura do React para criar ferramentas internas, painéis de administração, painéis e aplicativos B2B com flexibilidade incomparável ✨
 
-Refine's hooks and components simplifies the development process and eliminates the repetitive tasks by providing industry-standard solutions for crucial aspects of a project, including authentication, access control, routing, networking, state management, and i18n.
+Os ganchos e componentes da Refine simplifica o processo de desenvolvimento e elimina as tarefas repetitivas, fornecendo soluções padrão do setor para aspectos cruciais de um projeto, incluindo autenticação, controle de acesso, roteamento, rede, gerenciamento de estados e i18n.
 
-## Available Scripts
+## Scripts disponíveis
 
-### Running the development server.
+### Executando o servidor de desenvolvimento.
 
 ```bash
     npm run dev
 ```
 
-### Building for production.
+### Construção para produção.
 
 ```bash
     npm run build
 ```
 
-### Running the production server.
+### Executando o servidor de produção.
 
 ```bash
     npm run start
 ```
 
-## Learn More
+## Saber mais
 
-To learn more about **Refine**, please check out the [Documentation](https://refine.dev/docs)
+Para saber mais sobre ** Refine **, confira a [Documentação] (https://refine.dev/docs)
 
-- **REST Data Provider** [Docs](https://refine.dev/docs/core/providers/data-provider/#overview)
-- **Ant Design** [Docs](https://refine.dev/docs/ui-frameworks/antd/tutorial/)
-- **React Router** [Docs](https://refine.dev/docs/core/providers/router-provider/)
+- ** Provedor de dados REST ** [Docs] (https://refine.dev/docs/core/providers/data-provider/#overview)
+- ** Design de formigas ** [Docs] (https://refine.dev/docs/ui-frameworks/antd/tutorial/)
+- ** React Router ** [Docs] (https://refine.dev/docs/core/providers/router-provider/)
 
-## License
+## Licença
 
 MIT
