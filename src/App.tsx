@@ -43,8 +43,6 @@ import ThirdPartiesServicesList from "./pages/thirdparties/ThirdPartiesServicesL
 import Util404Page from "./pages/utils/Util404Page";
 import DashboardPage from "./pages/dashboard/DashboardPage";
 
-document.title = "SEDI";
-
 function App() {
   return (
     <BrowserRouter>
@@ -95,7 +93,7 @@ function App() {
                 </Routes>
                 <RefineKbar />
                 <UnsavedChangesNotifier />
-                <DocumentTitleHandler />
+                {/* <DocumentTitleHandler /> */}
               </Refine>
              {/*  <DevtoolsPanel /> */}
             </DevtoolsProvider>
