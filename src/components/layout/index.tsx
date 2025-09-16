@@ -64,7 +64,8 @@ import {
 import type { MenuProps } from 'antd';
 import {
 	Breadcrumb, Flex, Layout, Menu, Space, theme, Tooltip, Dropdown, Avatar, Badge, Button, Typography,
-	Tabs, Drawer, List, Tag, Empty
+	Tabs, Drawer, List, Tag, Empty,
+	ConfigProvider
  } from 'antd';
 import { Link, Outlet, useNavigate } from 'react-router';
 import Logo from '@/assets/logo/sedi-logo.svg'
@@ -494,6 +495,15 @@ const LayoutApp: React.FC = () => {
 				<div className="min-w-[200px] flex justify-center items-center">
 					<img src={Logo} alt='Logo SEDI' height={25} className='' />	
 				</div>
+      <ConfigProvider
+        theme={{
+          components: {
+						Menu: {
+							itemHeight: 32
+            },
+          },
+        }}
+      >
         <Menu
           mode="horizontal"
           defaultSelectedKeys={['2']}
@@ -507,6 +517,7 @@ const LayoutApp: React.FC = () => {
 						[&_.ant-menu-item-active::after]:!border-b-0
 					'  
 				/>
+      </ConfigProvider>
 				
         {/* AÇÕES RÁPIDAS (lado direito) */}
 				<Space size="small" align="center" className="ml-2">
