@@ -60,6 +60,9 @@ import {
   CloseCircleOutlined,
   DeleteOutlined,
 	LogoutOutlined,
+	MenuUnfoldOutlined,
+	MenuFoldOutlined,
+	MenuOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import {
@@ -447,6 +450,10 @@ const siderStyle: React.CSSProperties = {
 
 const LayoutApp: React.FC = () => {
 	const { Header, Sider } = Layout;
+  const [collapsed, setCollapsed] = useState(false);
+  const toggleCollapsed = () => {
+    setCollapsed(!collapsed);
+  };
 
   const {
     token: { colorBgContainer, borderRadiusLG },
@@ -491,10 +498,19 @@ const LayoutApp: React.FC = () => {
           zIndex: 1,
           width: '100%',
           display: 'flex',
-          alignItems: 'center', }} className='bg-[#217346] h-[60px]'>
-				<div className="min-w-[200px] flex justify-center items-center">
+				alignItems: 'center',
+			}} className='bg-[#217346] h-[60px]'>
+
+				
+				<div className="flex justify-center items-center gap-2 me-4">
+					<div>
+				<Button color="default" variant="text" className='text-white' onClick={toggleCollapsed} style={{ marginBottom: 16 }}
+					icon={<MenuOutlined />} /></div>
+				<Link to="/">
 					<img src={Logo} alt='Logo SEDI' height={25} className='' />	
+				</Link>
 				</div>
+
       <ConfigProvider
         theme={{
           components: {
@@ -572,17 +588,17 @@ const LayoutApp: React.FC = () => {
 
 			<Layout className=''>
 				<Sider
-					collapsible 
+					 
 					breakpoint="lg"
-					width={200}
+					width={collapsed ? 70 : 200}
 					style={siderStyle}>
 					<div className='w-full h-12 m-2 bg-emerald-700/70 rounded py-2 px-3 text-[10px] text-white'>
 						<Flex gap={1} vertical>
 							<Flex justify='space-between'>
-								<div>TEMPO REAL</div>
-								<div>25 out 2025 - 21h35</div>
+								{!collapsed && <div>TEMPO REAL</div>}
+								<div>25 out 2025 {!collapsed && '- 21h35'}</div>
 							</Flex>
-							<Flex justify='space-between'>
+							{!collapsed && <Flex justify='space-between'>
 
 								<Tooltip title="Clientes">
 									<Space size={2} align="center">
@@ -612,10 +628,11 @@ const LayoutApp: React.FC = () => {
 									</Space>
 								</Tooltip>
 
-							</Flex>
+							</Flex>}
 						</Flex>
 					</div>
           <Menu
+        inlineCollapsed={collapsed}
 						mode="inline"
 						onClick={onClick}
             defaultSelectedKeys={['1']}
@@ -625,7 +642,7 @@ const LayoutApp: React.FC = () => {
 					className='bg-neutral-100'
           />
         </Sider>
-        <Layout style={{ padding: '0 24px 24px 220px' }}>
+        <Layout style={{ padding: collapsed ? '0 24px 24px 90px' : '0 24px 24px 220px' }}>
             <Outlet />
         </Layout>
       </Layout>
