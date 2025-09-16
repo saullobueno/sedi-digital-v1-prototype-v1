@@ -1,0 +1,408 @@
+import { RightOutlined } from '@ant-design/icons';
+import { Button, Space, Tag } from 'antd';
+import type { TableProps } from 'antd';
+import ActionsDropdown from '../utils/actionsDropdown';
+
+export interface DataType {
+  key: string;
+
+  // Identificação do contato
+  company?: string;      // Empresa (opcional, pode ser lead PF)
+  contact: string;       // Nome do contato
+  phone?: string;
+  email: string;
+  role?: string;         // Cargo/Função (opcional)
+
+  // Detalhes do contato
+  channel: string;       // Website, WhatsApp, E-mail, Telefone, LinkedIn, Instagram, etc.
+  subject: string;       // Assunto resumido
+  message: string;       // Mensagem (trecho)
+  receivedAt: string;    // Data/hora recebimento (DD/MM/YYYY HH:mm)
+  source?: string;       // Ex.: Formulário "Fale Conosco", Landing Page, Indicação
+
+  // Tratativa
+  priority: 'Alta' | 'Média' | 'Baixa';
+  status: string[];      // Novo, Em atendimento, Respondido, Encerrado, Spam
+  assignedTo?: string;   // Responsável interno
+}
+
+export const columns: TableProps<DataType>['columns'] = [
+  {
+    title: 'Contato',
+    dataIndex: 'contact',
+    key: 'contact',
+  },
+  { title: 'Empresa', dataIndex: 'company', key: 'company' },
+  { title: 'Email', dataIndex: 'email', key: 'email' },
+  { title: 'Telefone', dataIndex: 'phone', key: 'phone' },
+  { title: 'Cargo', dataIndex: 'role', key: 'role' },
+  { title: 'Canal', dataIndex: 'channel', key: 'channel' },
+  { title: 'Assunto', dataIndex: 'subject', key: 'subject' },
+  {
+    title: 'Mensagem',
+    dataIndex: 'message',
+    key: 'message',
+    render: (text) => (
+      <span style={{ display: 'inline-block', maxWidth: 320, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {text}
+      </span>
+    ),
+  },
+  { title: 'Recebido em', dataIndex: 'receivedAt', key: 'receivedAt' },
+  { title: 'Origem', dataIndex: 'source', key: 'source' },
+  {
+    title: 'Prioridade',
+    dataIndex: 'priority',
+    key: 'priority',
+    render: (level) => {
+      const color = level === 'Alta' ? 'volcano' : level === 'Média' ? 'gold' : 'green';
+      return <Tag color={color}>{String(level).toUpperCase()}</Tag>;
+    },
+  },
+  {
+    title: 'Status',
+    key: 'status',
+    dataIndex: 'status',
+    render: (_, { status }) => (
+      <>
+        {status.map((tag) => {
+          let color = 'blue';
+          if (tag === 'Novo') color = 'geekblue';
+          if (tag === 'Em atendimento') color = 'processing';
+          if (tag === 'Respondido') color = 'green';
+          if (tag === 'Encerrado') color = 'default';
+          if (tag === 'Spam') color = 'magenta';
+          return (
+            <Tag color={color} key={tag}>
+              {tag}
+            </Tag>
+          );
+        })}
+      </>
+    ),
+  },
+  { title: 'Atribuído', dataIndex: 'assignedTo', key: 'assignedTo' },
+];
+
+export const data: DataType[] = [
+  {
+    key: '1',
+    contact: 'Mariana Souza',
+    company: 'AgroVida S/A',
+    email: 'mariana.souza@agrovida.com',
+    phone: '(16) 3232-1000',
+    role: 'Compras',
+    channel: 'Website',
+    subject: 'Informações sobre Licença Ambiental',
+    message: 'Olá, gostaria de entender o prazo e documentos para LP/LI/LO para nossa unidade...',
+    receivedAt: '03/09/2025 09:12',
+    source: 'Fale Conosco',
+    priority: 'Alta',
+    status: ['Novo'],
+    assignedTo: 'Mariana Silva',
+  },
+  {
+    key: '2',
+    contact: 'Carlos Andrade',
+    company: 'Tech Solutions Ltda',
+    email: 'c.andrade@techsolutions.com',
+    phone: '(11) 98765-4321',
+    role: 'COO',
+    channel: 'WhatsApp',
+    subject: 'Alvará de Funcionamento - matriz e filiais',
+    message: 'Temos mudança de endereço e preciso estimativa de custos e prazos...',
+    receivedAt: '02/09/2025 17:40',
+    source: 'QR Code site',
+    priority: 'Média',
+    status: ['Em atendimento'],
+    assignedTo: 'Rafael Souza',
+  },
+  {
+    key: '3',
+    contact: 'Beatriz Martins',
+    company: 'TransLog Transportes',
+    email: 'b.martins@translog.com',
+    phone: '(81) 97777-8888',
+    role: 'Facilities',
+    channel: 'E-mail',
+    subject: 'AVCB para novo galpão',
+    message: 'Precisamos de projeto e emissão de AVCB para um galpão de 5.000 m² em Recife...',
+    receivedAt: '01/09/2025 08:05',
+    source: 'E-mail direto',
+    priority: 'Alta',
+    status: ['Em atendimento'],
+    assignedTo: 'João Oliveira',
+  },
+  {
+    key: '4',
+    contact: 'Fernanda Rocha',
+    company: 'Construmax Engenharia',
+    email: 'fernanda.rocha@construmax.com.br',
+    phone: '(31) 99888-1234',
+    role: 'Engenheira',
+    channel: 'Telefone',
+    subject: 'Renovação AVCB e plano de emergência',
+    message: 'Quero cotação para renovação do AVCB e treinamento de brigada...',
+    receivedAt: '31/08/2025 15:22',
+    source: 'Ligação',
+    priority: 'Média',
+    status: ['Respondido'],
+    assignedTo: 'Ricardo Almeida',
+  },
+  {
+    key: '5',
+    contact: 'Eduardo Ramos',
+    company: 'Green Ambiental',
+    email: 'eduardo.ramos@greenambiental.com',
+    phone: '(51) 3232-9090',
+    role: 'Diretor',
+    channel: 'LinkedIn',
+    subject: 'Apoio em CTF/IBAMA',
+    message: 'Podem auxiliar na atualização do CTF e inclusão de atividades?',
+    receivedAt: '30/08/2025 10:48',
+    source: 'InMail',
+    priority: 'Baixa',
+    status: ['Respondido'],
+    assignedTo: 'Lucas Pereira',
+  },
+  {
+    key: '6',
+    contact: 'Amanda Costa',
+    company: 'Food Service Brasil',
+    email: 'amanda.costa@foodbr.com',
+    phone: '(71) 95555-0000',
+    role: 'Jurídico',
+    channel: 'Website',
+    subject: 'Outorga de Poço',
+    message: 'Temos um poço artesiano e precisamos regularizar o uso da água...',
+    receivedAt: '29/08/2025 11:07',
+    source: 'Landing Page - Água',
+    priority: 'Média',
+    status: ['Novo'],
+    assignedTo: 'Renata Carvalho',
+  },
+  {
+    key: '7',
+    contact: 'João Oliveira',
+    company: 'EducaMais Online',
+    email: 'joao.oliveira@educamais.com',
+    phone: '(11) 91212-3434',
+    role: 'Operações',
+    channel: 'Instagram',
+    subject: 'Alvará de Funcionamento para estúdio',
+    message: 'Qual o passo a passo para licenciar um estúdio de gravação EAD?',
+    receivedAt: '28/08/2025 16:30',
+    source: 'DM Instagram',
+    priority: 'Baixa',
+    status: ['Respondido'],
+    assignedTo: 'Paula Ferreira',
+  },
+  {
+    key: '8',
+    contact: 'Tatiane Alves',
+    company: 'Finance Group S/A',
+    email: 'tatiane.alves@financegroup.com',
+    phone: '(11) 4002-8922',
+    role: 'Administração',
+    channel: 'Website',
+    subject: 'Mudança de endereço - licenças',
+    message: 'Vamos mudar de prédio e precisamos transferir alvarás e sanitário...',
+    receivedAt: '27/08/2025 09:55',
+    source: 'Formulário - Comercial',
+    priority: 'Alta',
+    status: ['Em atendimento'],
+    assignedTo: 'Amanda Costa',
+  },
+  {
+    key: '9',
+    contact: 'Lucas Pereira',
+    company: 'Mega Indústria Metalúrgica',
+    email: 'lucas.pereira@megaind.com',
+    phone: '(47) 98888-5555',
+    role: 'Facilities',
+    channel: 'WhatsApp',
+    subject: 'Renovação de licenças ambiental + sanitária',
+    message: 'Planta com 8.000 m² precisa renovar licenças, quais documentos?',
+    receivedAt: '26/08/2025 14:19',
+    source: 'Botão WhatsApp',
+    priority: 'Alta',
+    status: ['Em atendimento'],
+    assignedTo: 'Mariana Silva',
+  },
+  {
+    key: '10',
+    contact: 'Renata Carvalho',
+    company: 'Travel Tour Viagens',
+    email: 'renata.carvalho@traveltour.com',
+    phone: '(21) 97676-1212',
+    role: 'Gerente',
+    channel: 'E-mail',
+    subject: 'Enquadramento CNAE x licenças',
+    message: 'Podem revisar os CNAEs para garantir conformidade com exigências municipais?',
+    receivedAt: '25/08/2025 08:40',
+    source: 'E-mail direto',
+    priority: 'Média',
+    status: ['Respondido'],
+    assignedTo: 'João Oliveira',
+  },
+  {
+    key: '11',
+    contact: 'Gustavo Nogueira',
+    company: 'Saúde & Vida',
+    email: 'gustavo.nogueira@saudevida.com',
+    phone: '(11) 91111-2222',
+    role: 'Operações',
+    channel: 'Telefone',
+    subject: 'Alvará Sanitário de clínica',
+    message: 'Preciso entender adequações e prazos para alvará sanitário...',
+    receivedAt: '24/08/2025 13:12',
+    source: 'Ligação',
+    priority: 'Alta',
+    status: ['Em atendimento'],
+    assignedTo: 'Paula Ferreira',
+  },
+  {
+    key: '12',
+    contact: 'Paula Ferreira',
+    company: 'AutoCenter Brasil',
+    email: 'paula.ferreira@autocenter.com',
+    phone: '(19) 98888-1111',
+    role: 'Gerente de Loja',
+    channel: 'Website',
+    subject: 'AVCB e treinamento de brigada',
+    message: 'Loja e oficina precisam de AVCB e treinamento. Podem enviar proposta?',
+    receivedAt: '23/08/2025 18:03',
+    source: 'Fale Conosco',
+    priority: 'Média',
+    status: ['Respondido'],
+    assignedTo: 'Rafael Souza',
+  },
+  {
+    key: '13',
+    contact: 'Ricardo Almeida',
+    company: 'SmartHome Solutions',
+    email: 'ricardo.almeida@smarthome.com',
+    phone: '(11) 95555-9999',
+    role: 'Head de Produto',
+    channel: 'LinkedIn',
+    subject: 'Certificação/Conformidade INMETRO',
+    message: 'Precisamos avaliar requisitos de conformidade para serviços...',
+    receivedAt: '22/08/2025 11:29',
+    source: 'InMail',
+    priority: 'Baixa',
+    status: ['Respondido'],
+    assignedTo: 'Lucas Pereira',
+  },
+  {
+    key: '14',
+    contact: 'Carla Souza',
+    company: 'Pet Lovers',
+    email: 'carla.souza@petlovers.com',
+    phone: '(48) 97777-4444',
+    role: 'Sócia',
+    channel: 'Instagram',
+    subject: 'Alvará de Funcionamento + Sanitário',
+    message: 'Qual sequência correta para licenciar loja com banho e tosa?',
+    receivedAt: '21/08/2025 19:10',
+    source: 'DM Instagram',
+    priority: 'Média',
+    status: ['Em atendimento'],
+    assignedTo: 'André Barbosa',
+  },
+  {
+    key: '15',
+    contact: 'André Barbosa',
+    company: 'ImobiReal Consultoria',
+    email: 'andre.barbosa@imobireal.com',
+    phone: '(11) 93333-8888',
+    role: 'Diretor',
+    channel: 'Website',
+    subject: 'Licença de Publicidade para letreiro',
+    message: 'Fachada com letreiro luminoso precisa de licença específica?',
+    receivedAt: '20/08/2025 10:02',
+    source: 'Landing Page - Publicidade',
+    priority: 'Baixa',
+    status: ['Respondido'],
+    assignedTo: 'Mariana Silva',
+  },
+  {
+    key: '16',
+    contact: 'Sofia Lima',
+    company: 'StartUpX Inovação',
+    email: 'sofia.lima@startupx.com',
+    phone: '(11) 92222-1111',
+    role: 'COO',
+    channel: 'Chatbot',
+    subject: 'AVCB para coworking',
+    message: 'Coworking com data room precisa de quais exigências?',
+    receivedAt: '19/08/2025 22:47',
+    source: 'Chat do site',
+    priority: 'Média',
+    status: ['Em atendimento'],
+    assignedTo: 'Gustavo Nogueira',
+  },
+  {
+    key: '17',
+    contact: 'Henrique Duarte',
+    company: 'Global Import Export',
+    email: 'henrique.duarte@globalimport.com',
+    phone: '(92) 91111-9999',
+    role: 'Logística',
+    channel: 'E-mail',
+    subject: 'MTR para resíduos classe II',
+    message: 'Precisamos de autorização para geração e transporte de resíduos...',
+    receivedAt: '18/08/2025 07:55',
+    source: 'E-mail direto',
+    priority: 'Alta',
+    status: ['Respondido'],
+    assignedTo: 'Renata Carvalho',
+  },
+  {
+    key: '18',
+    contact: 'Juliana Mendes',
+    company: 'Moda & Estilo LTDA',
+    email: 'juliana.mendes@modaestilo.com',
+    phone: '(41) 91234-5678',
+    role: 'Marketing',
+    channel: 'Website',
+    subject: 'Licença de Publicidade (outdoors)',
+    message: 'Três pontos de mídia OOH precisam de licença. Vocês auxiliam?',
+    receivedAt: '17/08/2025 12:24',
+    source: 'Fale Conosco',
+    priority: 'Baixa',
+    status: ['Encerrado'],
+    assignedTo: 'Tatiane Alves',
+  },
+  {
+    key: '19',
+    contact: 'Joana Lima',
+    company: undefined,
+    email: 'joana.lima@gmail.com',
+    phone: '(11) 94000-1234',
+    role: '—',
+    channel: 'Website',
+    subject: 'Dúvida geral sobre serviços',
+    message: 'Atendem pessoa física para orientação de alvará residencial?',
+    receivedAt: '16/08/2025 09:11',
+    source: 'Fale Conosco',
+    priority: 'Baixa',
+    status: ['Respondido'],
+    assignedTo: 'Atendimento',
+  },
+  {
+    key: '20',
+    contact: 'Spam Bot',
+    company: undefined,
+    email: 'promo@newsletter-xyz.biz',
+    phone: '',
+    role: '—',
+    channel: 'E-mail',
+    subject: 'Oferta comercial irrelevante',
+    message: 'Ganhe descontos incríveis clicando neste link...',
+    receivedAt: '15/08/2025 03:02',
+    source: 'E-mail',
+    priority: 'Baixa',
+    status: ['Spam'],
+    assignedTo: '—',
+  },
+];

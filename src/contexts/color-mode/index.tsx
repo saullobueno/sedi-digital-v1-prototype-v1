@@ -21,7 +21,7 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
 }) => {
   const colorModeFromLocalStorage = localStorage.getItem("colorMode");
   const isSystemPreferenceDark = window?.matchMedia(
-    "(prefers-color-scheme: dark)"
+    "(prefers-color-scheme: light)"
   ).matches;
 
   const systemPreference = isSystemPreferenceDark ? "dark" : "light";
@@ -52,9 +52,25 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
     >
       <ConfigProvider
         // you can change the theme colors here. example: ...RefineThemes.Magenta,
-        theme={{
-          ...RefineThemes.Blue,
-          algorithm: mode === "light" ? defaultAlgorithm : darkAlgorithm,
+				theme={{
+					...RefineThemes.Blue,
+					algorithm: mode === "dark" ? darkAlgorithm : defaultAlgorithm,
+					token: {
+						colorLink: '#217346',
+						colorPrimary: '#217346',
+					},
+					components: {
+						Layout: {
+							headerPadding: "0 12px",
+							siderBg: "transparent",
+							triggerBg: "transparent",
+						},
+						Menu: {
+							activeBarBorderWidth: '0',
+							itemHeight: 14,
+							fontSize: 12,
+						}
+					}
         }}
       >
         {children}
