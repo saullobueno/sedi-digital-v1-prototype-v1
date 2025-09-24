@@ -63,6 +63,8 @@ import {
 	MenuUnfoldOutlined,
 	MenuFoldOutlined,
 	MenuOutlined,
+	DownOutlined,
+	CaretDownOutlined,
 } from '@ant-design/icons';
 import type { MenuProps } from 'antd';
 import {
@@ -382,18 +384,14 @@ const itemsMainMenu: MenuProps['items'] = [
 
     { key: 1, label: 'Comercial', type: 'group' },
     { key: 2, label: <Link to='/clients'>Clientes</Link>, icon: <TeamOutlined /> },
-    { key: 3, label: <Link to='/budgets'>Orçamentos</Link>, icon: <SolutionOutlined /> },
+    { key: 10, label: <Link to='/fsp'>FSP</Link>, icon: <AppstoreOutlined /> },
     { key: 4, label: <Link to='/contacts'>Contatos</Link>, icon: <PhoneOutlined /> },
     { key: 5, label: <Link to='/support'>Suporte</Link>, icon: <CustomerServiceOutlined /> },
 
-    { key: 6, label: 'Marketing', type: 'group' },
-    { key: 7, label: <Link to='/campaigns'>Campanhas</Link>, icon: <RocketOutlined /> },
-    { key: 8, label: <Link to='/socialmedia'>Redes Sociais</Link>, icon: <ShareAltOutlined /> },
-
-    { key: 9, label: 'Propostas', type: 'group' },
-    { key: 10, label: <Link to='/fsp'>FSP</Link>, icon: <AppstoreOutlined /> },
-    { key: 11, label: <Link to='/services'>Serviços</Link>, icon: <ToolOutlined /> },
+    { key: 9, label: 'OS', type: 'group' },
     { key: 12, label: <Link to='/proposals'>Propostas</Link>, icon: <FileTextOutlined /> },
+    { key: 11, label: <Link to='/services'>Serviços</Link>, icon: <ToolOutlined /> },
+    { key: 11, label: <Link to='/processes'>Processos</Link>, icon: <ToolOutlined /> },
 
     { key: 13, label: 'Execução', type: 'group' },
     { key: 14, label: <Link to='/planning'>Planejamento</Link>, icon: <ProjectOutlined /> },
@@ -405,6 +403,10 @@ const itemsMainMenu: MenuProps['items'] = [
     { key: 19, label: <Link to='/progress'>Andamento</Link>, icon: <NotificationOutlined /> },
     { key: 20, label: <Link to='/pending'>Pendentes</Link>, icon: <HourglassOutlined /> },
     { key: 21, label: <Link to='/finalized'>Finalizados</Link>, icon: <CheckCircleOutlined /> },
+
+    { key: 6, label: 'Marketing', type: 'group' },
+    { key: 7, label: <Link to='/campaigns'>Campanhas</Link>, icon: <RocketOutlined /> },
+    { key: 8, label: <Link to='/socialmedia'>Redes Sociais</Link>, icon: <ShareAltOutlined /> },
 
     { key: 22, label: 'Financeiro', type: 'group' },
     { key: 23, label: <Link to='/billing'>Faturamento</Link>, icon: <DollarOutlined /> },
@@ -485,6 +487,58 @@ const LayoutApp: React.FC = () => {
     }
   };
 
+const itemsCreate: MenuProps['items'] = [
+  {
+    label: 'Cliente',
+    key: '1',
+    icon: <TeamOutlined />,
+  },
+  {
+    label: 'FSP',
+    key: '2',
+    icon: <AppstoreOutlined />,
+  },
+  {
+    label: 'Proposta',
+    key: '3',
+    icon: <FileTextOutlined />,
+  },
+  {
+    label: 'Campanha',
+    key: '4',
+    icon: <RocketOutlined />,
+  },
+  {
+    label: 'Fatura',
+    key: '5',
+    icon: <DollarOutlined />,
+  },
+  {
+    label: 'Conta a pagar',
+    key: '6',
+    icon: <CreditCardOutlined />,
+  },
+  {
+    label: 'Conta a receber',
+    key: '7',
+    icon: <WalletOutlined />,
+  },
+  {
+    label: 'Recrutamento',
+    key: '8',
+    icon: <UserAddOutlined />,
+  },
+  {
+    label: 'Fornecedor',
+    key: '9',
+    icon: <ShopOutlined />,
+  },
+  {
+    label: 'Serviço de terceiro',
+    key: '10',
+    icon: <ToolOutlined />,
+  },
+];
   // opcional: contagem de notificações vinda do backend
   const unreadNotifications = 7;
 
@@ -537,7 +591,41 @@ const LayoutApp: React.FC = () => {
 				
         {/* AÇÕES RÁPIDAS (lado direito) */}
 				<Space size="small" align="center" className="ml-2">
-					
+
+					<div>
+						<Flex gap={20} justify='space-between' align='center' className='h-10 bg-white/10 rounded-lg py-1 px-3  text-white'>
+
+								<Tooltip title="Clientes">
+									<Space size={6} align="center">
+										<SmileOutlined />
+										<div>520</div>
+									</Space>
+								</Tooltip>
+
+								<Tooltip title="FSPs">
+									<Space size={6} align="center">
+										<FileTextOutlined />
+										<div>152</div>
+									</Space>
+								</Tooltip>
+
+								<Tooltip title="Propostas">
+									<Space size={6} align="center">
+										<AuditOutlined />
+										<div>82</div>
+									</Space>
+								</Tooltip>
+
+								<Tooltip title="Processos">
+									<Space size={6} align="center">
+										<DollarOutlined />
+										<div>255</div>
+									</Space>
+							</Tooltip>
+							
+						</Flex>
+					</div>
+
           <Tooltip title="Notificações">
             <Badge count={unreadCount} size="small" overflowCount={99}>
               <Button
@@ -592,45 +680,18 @@ const LayoutApp: React.FC = () => {
 					breakpoint="lg"
 					width={collapsed ? 70 : 200}
 					style={siderStyle}>
-					<div className='w-full h-12 m-2 bg-emerald-700/70 rounded py-2 px-3 text-[10px] text-white'>
-						<Flex gap={1} vertical>
-							<Flex justify='space-between'>
-								{!collapsed && <div>TEMPO REAL</div>}
-								<div>25 out 2025 {!collapsed && '- 21h35'}</div>
-							</Flex>
-							{!collapsed && <Flex justify='space-between'>
+					
+					<Space direction='vertical'>
 
-								<Tooltip title="Clientes">
-									<Space size={2} align="center">
-										<SmileOutlined />
-										<div>3500</div>
-									</Space>
-								</Tooltip>
-
-								<Tooltip title="Propostas">
-									<Space size={2} align="center">
-										<FileTextOutlined />
-										<div>3500</div>
-									</Space>
-								</Tooltip>
-
-								<Tooltip title="Protocolos">
-									<Space size={2} align="center">
-										<AuditOutlined />
-										<div>3500</div>
-									</Space>
-								</Tooltip>
-
-								<Tooltip title="Faturamento">
-									<Space size={2} align="center">
-										<DollarOutlined />
-										<div>3500</div>
-									</Space>
-								</Tooltip>
-
-							</Flex>}
-						</Flex>
-					</div>
+					</Space>
+						<Dropdown menu={{items: itemsCreate}} className='w-full m-2 rounded-lg py-2 px-3 text-white'>
+							<Button type='primary' className='shadow-none' icon={<CaretDownOutlined />} iconPosition='end'>
+									Novo
+							</Button>
+						</Dropdown>
+						
+					
+					
           <Menu
         inlineCollapsed={collapsed}
 						mode="inline"

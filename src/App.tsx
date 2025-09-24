@@ -42,6 +42,7 @@ import SuppliersList from "./pages/thirdparties/SuppliersList";
 import ThirdPartiesServicesList from "./pages/thirdparties/ThirdPartiesServicesList";
 import Util404Page from "./pages/utils/Util404Page";
 import DashboardPage from "./pages/dashboard/DashboardPage";
+import ProcessesList from "./pages/proposals/PreocessesList";
 
 function App() {
   return (
@@ -71,8 +72,9 @@ function App() {
                   	<Route path="/campaigns" element={<CampaignsList />} />
                   	<Route path="/socialmedia" element={<SocialMediaList />} />
                   	<Route path="/fsp" element={<FSPList />} />
-                  	<Route path="/services" element={<ServicesList />} />
                   	<Route path="/proposals" element={<ProposalsList />} />
+                  	<Route path="/services" element={<ServicesList />} />
+                  	<Route path="/processes" element={<ProcessesList />} />
                   	<Route path="/planning" element={<PlanningList />} />
                   	<Route path="/assembly" element={<AssemblyList />} />
                   	<Route path="/recording" element={<RecordingList />} />

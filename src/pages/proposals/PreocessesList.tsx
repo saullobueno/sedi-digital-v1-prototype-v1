@@ -32,7 +32,7 @@ import OptionsToolbar from "../../components/crud/list/OptionsToolbar";
 
 const STATUS_OPCOES = ["Ativo", "Inativo", "Potencial", "Negociando"] as const;
 
-const ServicesList: React.FC = () => {
+const ProcessesList: React.FC = () => {
 	const [dataSource, setDataSource] = useState<DataType[]>(data);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [selected, setSelected] = useState<DataType | null>(null);
@@ -72,7 +72,7 @@ const ServicesList: React.FC = () => {
 	return (
 		<>
 			<Breadcrumb
-				items={[{ title: 'Inicio' }, { title: 'OS' }, { title: 'Serviços' }]}
+				items={[{ title: 'Inicio' }, { title: 'OS' }, { title: 'Processos' }]}
 				className='my-4 text-2xl font-semibold'
 			/>
 			<Content className="p-4 m-0 bg-white rounded-lg border border-solid border-neutral-200">
@@ -149,4 +149,4 @@ const ServicesList: React.FC = () => {
 	);
 }
 
-export default ServicesList;
+export default ProcessesList;
