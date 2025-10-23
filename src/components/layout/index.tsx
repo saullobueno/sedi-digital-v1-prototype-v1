@@ -66,6 +66,31 @@ import {
 	DownOutlined,
 	CaretDownOutlined,
 } from '@ant-design/icons';
+import {
+  FcBusinessman,
+  FcDepartment,
+  FcBusinessContact,
+  FcAssistant,
+  FcDocument,
+  FcServices,
+  FcProcess,
+  FcPlanner,
+  FcFactoryBreakdown,
+  FcApproval,
+  FcTodoList,
+  FcInTransit,
+  FcAlarmClock,
+  FcOk,
+  FcAdvertising,
+  FcShare,
+  FcMoneyTransfer,
+  FcDebt,
+  FcPositiveDynamic,
+  FcManager,
+  FcAddDatabase,
+  FcShop,
+  FcCollaboration,
+} from "react-icons/fc";
 import type { MenuProps } from 'antd';
 import {
 	Breadcrumb, Flex, Layout, Menu, Space, theme, Tooltip, Dropdown, Avatar, Badge, Button, Typography,
@@ -381,45 +406,55 @@ export const itemsMenuHeader: MenuProps["items"] = [
 
 //@ts-ignore
 const itemsMainMenu: MenuProps['items'] = [
+  { key: 1, label: "Comercial", type: "group" },
+  { key: 2, label: <Link to="/clients">Clientes</Link>, icon: <FcBusinessman className='text-lg me-2' /> },
+  { key: 10, label: <Link to="/fsp">FSP</Link>, icon: <FcDepartment className='text-lg me-2' /> },
+  { key: 4, label: <Link to="/contacts">Contatos</Link>, icon: <FcBusinessContact className='text-lg me-2' /> },
+  { key: 5, label: <Link to="/support">Suporte</Link>, icon: <FcAssistant className='text-lg me-2' /> },
 
-    { key: 1, label: 'Comercial', type: 'group' },
-    { key: 2, label: <Link to='/clients'>Clientes</Link>, icon: <TeamOutlined /> },
-    { key: 10, label: <Link to='/fsp'>FSP</Link>, icon: <AppstoreOutlined /> },
-    { key: 4, label: <Link to='/contacts'>Contatos</Link>, icon: <PhoneOutlined /> },
-    { key: 5, label: <Link to='/support'>Suporte</Link>, icon: <CustomerServiceOutlined /> },
+  { key: 1, label: "Operação", type: "group" },
+	{ key: 12, label: <Link to="/proposals">Propostas</Link>, icon: <FcDocument className='text-lg me-2' /> },
+  { key: 17, label: <Link to="/protocols">Protocolos</Link>, icon: <FcTodoList className='text-lg me-2' /> },
+  { key: 20, label: <Link to="/pending">Arquivados</Link>, icon: <FcAddDatabase className='text-lg me-2' /> },
+  { key: 21, label: <Link to="/finalized">Finalizados</Link>, icon: <FcOk className='text-lg me-2' /> },
+	
+  { key: 22, label: "Financeiro", type: "group" },
+  { key: 23, label: <Link to="/billing">Faturamento</Link>, icon: <FcMoneyTransfer className='text-lg me-2' /> },
+  { key: 24, label: <Link to="/payable">Contas a Pagar</Link>, icon: <FcDebt className='text-lg me-2' /> },
+  { key: 25, label: <Link to="/receivable">Contas a Receber</Link>, icon: <FcPositiveDynamic className='text-lg me-2' /> },
 
-    { key: 9, label: 'OS', type: 'group' },
-    { key: 12, label: <Link to='/proposals'>Propostas</Link>, icon: <FileTextOutlined /> },
-    { key: 11, label: <Link to='/services'>Serviços</Link>, icon: <ToolOutlined /> },
-    { key: 11, label: <Link to='/processes'>Processos</Link>, icon: <ToolOutlined /> },
+  { key: 6, label: "Marketing", type: "group" },
+  { key: 7, label: <Link to="/campaigns">Campanhas</Link>, icon: <FcAdvertising className='text-lg me-2' /> },
+  { key: 8, label: <Link to="/socialmedia">Redes Sociais</Link>, icon: <FcShare className='text-lg me-2' /> },
 
-    { key: 13, label: 'Execução', type: 'group' },
-    { key: 14, label: <Link to='/planning'>Planejamento</Link>, icon: <ProjectOutlined /> },
-    { key: 15, label: <Link to='/assembly'>Montagem</Link>, icon: <BuildOutlined /> },
-    { key: 16, label: <Link to='/recording'>A Protocolar</Link>, icon: <FileProtectOutlined /> },
-    { key: 17, label: <Link to='/protocols'>Protocolos</Link>, icon: <FormOutlined /> },
+  { key: 26, label: "Recursos Humanos", type: "group" },
+  { key: 27, label: <Link to="/humanresourcesdepartment">Pessoal</Link>, icon: <FcManager className='text-lg me-2' /> },
+  { key: 28, label: <Link to="/recruitment">Recrutamento</Link>, icon: <FcAddDatabase className='text-lg me-2' /> },
 
-    { key: 18, label: 'Acompanhamento', type: 'group' },
-    { key: 19, label: <Link to='/progress'>Andamento</Link>, icon: <NotificationOutlined /> },
-    { key: 20, label: <Link to='/pending'>Pendentes</Link>, icon: <HourglassOutlined /> },
-    { key: 21, label: <Link to='/finalized'>Finalizados</Link>, icon: <CheckCircleOutlined /> },
+  { key: 1, label: "Administração", type: "group" },
+  { key: 11, label: <Link to="/services">Serviços</Link>, icon: <FcServices className='text-lg me-2' /> },
+  { key: 32, label: <Link to="/processes">Processos</Link>, icon: <FcProcess className='text-lg me-2' /> },
+	
+ /*  { key: 29, label: "Terceiros", type: "group" },
+  { key: 30, label: <Link to="/suppliers">Fornecedores</Link>, icon: <FcShop className='text-lg me-2' /> },
+	{ key: 31, label: <Link to="/thirdpartiesservices">Serviços</Link>, icon: <FcCollaboration className='text-lg me-2' /> }, */
+	
+  /* { key: 9, label: "OS", type: "group" },
+  { key: 12, label: <Link to="/proposals">Propostas</Link>, icon: <FcDocument className='text-lg me-2' /> },
+  { key: 11, label: <Link to="/services">Serviços</Link>, icon: <FcServices className='text-lg me-2' /> },
+  { key: 32, label: <Link to="/processes">Processos</Link>, icon: <FcProcess className='text-lg me-2' /> },
 
-    { key: 6, label: 'Marketing', type: 'group' },
-    { key: 7, label: <Link to='/campaigns'>Campanhas</Link>, icon: <RocketOutlined /> },
-    { key: 8, label: <Link to='/socialmedia'>Redes Sociais</Link>, icon: <ShareAltOutlined /> },
+  { key: 13, label: "Execução", type: "group" },
+  { key: 14, label: <Link to="/planning">Planejamento</Link>, icon: <FcPlanner className='text-lg me-2' /> },
+  { key: 15, label: <Link to="/assembly">Montagem</Link>, icon: <FcFactoryBreakdown className='text-lg me-2' /> },
+  { key: 16, label: <Link to="/recording">A Protocolar</Link>, icon: <FcApproval className='text-lg me-2' /> },
+  { key: 17, label: <Link to="/protocols">Protocolos</Link>, icon: <FcTodoList className='text-lg me-2' /> },
 
-    { key: 22, label: 'Financeiro', type: 'group' },
-    { key: 23, label: <Link to='/billing'>Faturamento</Link>, icon: <DollarOutlined /> },
-    { key: 24, label: <Link to='/payable'>Contas a Pagar</Link>, icon: <CreditCardOutlined /> },
-    { key: 25, label: <Link to='/receivable'>Contas a Receber</Link>, icon: <WalletOutlined /> },
+  { key: 18, label: "Acompanhamento", type: "group" },
+  { key: 19, label: <Link to="/progress">Andamento</Link>, icon: <FcInTransit className='text-lg me-2' /> },
+  { key: 20, label: <Link to="/pending">Pendentes</Link>, icon: <FcAlarmClock className='text-lg me-2' /> },
+  { key: 21, label: <Link to="/finalized">Finalizados</Link>, icon: <FcOk className='text-lg me-2' /> }, */
 
-    { key: 26, label: 'Recursos Humanos', type: 'group' },
-    { key: 27, label: <Link to='/humanresourcesdepartment'>Departamento Pessoal</Link>, icon: <IdcardOutlined /> },
-    { key: 28, label: <Link to='/recruitment'>Recrutamento</Link>, icon: <UserAddOutlined /> },
-
-    { key: 29, label: 'Terceiros', type: 'group' },
-    { key: 30, label: <Link to='/suppliers'>Fornecedores</Link>, icon: <ShopOutlined /> },
-    { key: 31, label: <Link to='/thirdpartiesservices'>Serviços</Link>, icon: <ToolOutlined /> },
 ].map(
   (item, index) => {
     const key = String(index + 1);

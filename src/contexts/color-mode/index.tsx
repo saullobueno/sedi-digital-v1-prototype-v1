@@ -67,8 +67,8 @@ export const ColorModeContextProvider: React.FC<PropsWithChildren> = ({
 						},
 						Menu: {
 							activeBarBorderWidth: '0',
-							itemHeight: 14,
-							fontSize: 12,
+							itemHeight: 24,
+							/* fontSize: 16, */
 						}
 					}
         }}
