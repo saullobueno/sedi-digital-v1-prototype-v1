@@ -54,52 +54,53 @@ export const columns: TableProps<DataType>['columns'] = [
     children: [
       { title: 'Nº FSP', dataIndex: 'numeroFSP', key: 'numeroFSP' },
       { title: 'Data', dataIndex: 'createdAt', key: 'createdAt' },
-      { title: 'Origem', dataIndex: 'channel', key: 'channel' },
-      { title: 'Unidade SEDI', dataIndex: 'sediUnit', key: 'sediUnit' },
+      { title: 'Origem', dataIndex: 'channel', key: 'channel', hidden: true },
+      { title: 'Unidade', dataIndex: 'sediUnit', key: 'sediUnit' },
     ],
   },
   {
     title: 'Cliente',
     children: [
       { title: 'Empresa', dataIndex: 'company', key: 'company' },
-      { title: 'Razão Social', dataIndex: 'corporateName', key: 'corporateName' },
+      { title: 'Razão Social', dataIndex: 'corporateName', key: 'corporateName', hidden: true },
       { title: 'CNPJ faturamento', dataIndex: 'billingCnpj', key: 'billingCnpj' },
-      { title: 'Filial/IBM/Sigla', dataIndex: 'branchCode', key: 'branchCode' },
-      { title: 'Endereço de execução', dataIndex: 'address', key: 'address' },
+      { title: 'Filial/IBM/Sigla', dataIndex: 'branchCode', key: 'branchCode', hidden: true },
+      { title: 'Endereço de execução', dataIndex: 'address', key: 'address', hidden: true },
     ],
   },
   {
     title: 'Contato',
     children: [
       { title: 'Contato', dataIndex: 'contactName', key: 'contactName' },
-      { title: 'Departamento', dataIndex: 'department', key: 'department' },
-      { title: 'E-mail contato', dataIndex: 'email', key: 'email' },
+      { title: 'Departamento', dataIndex: 'department', key: 'department', hidden: true },
+      { title: 'E-mail contato', dataIndex: 'email', key: 'email', hidden: true },
       { title: 'Telefone', dataIndex: 'phone', key: 'phone' },
-      { title: 'Solicitante', dataIndex: 'requestorName', key: 'requestorName' },
-      { title: 'E-mail solicitação', dataIndex: 'requestEmail', key: 'requestEmail' },
+      { title: 'Solicitante', dataIndex: 'requestorName', key: 'requestorName', hidden: true },
+      { title: 'E-mail solicitação', dataIndex: 'requestEmail', key: 'requestEmail', hidden: true },
     ],
   },
   {
     title: 'Serviço',
     children: [
       { title: 'Serviço', dataIndex: 'service', key: 'service' },
-      { title: 'Escopo', dataIndex: 'scope', key: 'scope' },
-      { title: 'Etapa/Modalidade', dataIndex: 'stageMode', key: 'stageMode' },
+      { title: 'Escopo', dataIndex: 'scope', key: 'scope', hidden: true },
+      { title: 'Etapa/Modalidade', dataIndex: 'stageMode', key: 'stageMode', hidden: true },
       {
         title: 'Metragem (m²)',
         dataIndex: 'areaM2',
         key: 'areaM2',
-        render: (v: number) => new Intl.NumberFormat('pt-BR').format(v),
+				render: (v: number) => new Intl.NumberFormat('pt-BR').format(v),
+				hidden: true
       },
-      { title: 'Cidade/UF', dataIndex: 'cityUF', key: 'cityUF' },
+      { title: 'Cidade/UF', dataIndex: 'cityUF', key: 'cityUF', hidden: true },
     ],
   },
   {
     title: 'Comercial',
     children: [
       { title: 'Prazo desejado', dataIndex: 'deadline', key: 'deadline' },
-      { title: 'Validade (dias)', dataIndex: 'validityDays', key: 'validityDays' },
-      { title: 'Valor estimado', dataIndex: 'estimatedValue', key: 'estimatedValue' },
+      { title: 'Validade (dias)', dataIndex: 'validityDays', key: 'validityDays', hidden: true },
+      { title: 'Valor estimado', dataIndex: 'estimatedValue', key: 'estimatedValue', hidden: true },
       {
         title: 'Prioridade',
         dataIndex: 'priority',
