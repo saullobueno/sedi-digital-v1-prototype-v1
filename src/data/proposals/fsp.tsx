@@ -16,7 +16,7 @@ export interface DataType {
   // Dados do cliente
   company: string;          // Nome fantasia
   corporateName: string;    // Razão Social
-  billingCnpj: string;      // CNPJ faturamento
+  billingCnpj: string;      // CNPJ faturamento (agora alfanumérico)
   branchCode: string;       // Filial/IBM/Sigla
   address: string;          // Endereço de execução do serviço
 
@@ -55,7 +55,7 @@ export const columns: TableProps<DataType>['columns'] = [
       { title: 'Nº FSP', dataIndex: 'numeroFSP', key: 'numeroFSP' },
       { title: 'Data', dataIndex: 'createdAt', key: 'createdAt' },
       { title: 'Origem', dataIndex: 'channel', key: 'channel', hidden: true },
-      { title: 'Unidade', dataIndex: 'sediUnit', key: 'sediUnit' },
+      { title: 'UF', dataIndex: 'sediUnit', key: 'sediUnit' },
     ],
   },
   {
@@ -71,10 +71,10 @@ export const columns: TableProps<DataType>['columns'] = [
   {
     title: 'Contato',
     children: [
-      { title: 'Contato', dataIndex: 'contactName', key: 'contactName' },
+      { title: 'Responsável', dataIndex: 'contactName', key: 'contactName' },
       { title: 'Departamento', dataIndex: 'department', key: 'department', hidden: true },
       { title: 'E-mail contato', dataIndex: 'email', key: 'email', hidden: true },
-      { title: 'Telefone', dataIndex: 'phone', key: 'phone' },
+      { title: 'Telefone', dataIndex: 'phone', key: 'phone', hidden: true },
       { title: 'Solicitante', dataIndex: 'requestorName', key: 'requestorName', hidden: true },
       { title: 'E-mail solicitação', dataIndex: 'requestEmail', key: 'requestEmail', hidden: true },
     ],
@@ -82,15 +82,15 @@ export const columns: TableProps<DataType>['columns'] = [
   {
     title: 'Serviço',
     children: [
-      { title: 'Serviço', dataIndex: 'service', key: 'service' },
+      { title: 'Pacote de serviços', dataIndex: 'service', key: 'service' },
       { title: 'Escopo', dataIndex: 'scope', key: 'scope', hidden: true },
       { title: 'Etapa/Modalidade', dataIndex: 'stageMode', key: 'stageMode', hidden: true },
       {
         title: 'Metragem (m²)',
         dataIndex: 'areaM2',
         key: 'areaM2',
-				render: (v: number) => new Intl.NumberFormat('pt-BR').format(v),
-				hidden: true
+        render: (v: number) => new Intl.NumberFormat('pt-BR').format(v),
+        hidden: true,
       },
       { title: 'Cidade/UF', dataIndex: 'cityUF', key: 'cityUF', hidden: true },
     ],
@@ -108,7 +108,8 @@ export const columns: TableProps<DataType>['columns'] = [
         render: (level) => {
           const color = level === 'Alta' ? 'volcano' : level === 'Média' ? 'gold' : 'green';
           return <Tag color={color}>{String(level).toUpperCase()}</Tag>;
-        },
+				},
+				hidden: true
       },
       {
         title: 'Status',
@@ -136,10 +137,9 @@ export const columns: TableProps<DataType>['columns'] = [
       { title: 'Responsável', dataIndex: 'responsible', key: 'responsible' },
     ],
   },
-
 ];
 
-/** === Linhas (20 FSPs) com servicesSelected (1–5 itens) === */
+/** === Linhas (20 FSPs) com CNPJ alfanumérico e serviço padronizado === */
 export const data: DataType[] = [
   {
     key: '1',
@@ -149,7 +149,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'AgroVida',
     corporateName: 'AgroVida S/A',
-    billingCnpj: '98.765.432/0001-55',
+    billingCnpj: '1A.B2C.3D4/5E6F-78',
     branchCode: 'RP-UNI01',
     address: 'Av. Pres. Vargas, 500 - Ribeirão Preto/SP',
     contactName: 'Mariana Souza',
@@ -158,7 +158,7 @@ export const data: DataType[] = [
     phone: '(16) 3232-1000',
     requestorName: 'Mariana Souza',
     requestEmail: 'solicitacao@agrovida.com',
-    service: 'Licença Ambiental',
+    service: 'Licença ambiental, ...e mais 4 serviços.',
     scope: 'Regularização de planta de beneficiamento',
     stageMode: 'LP/LI/LO',
     areaM2: 5200,
@@ -179,7 +179,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'Tech Solutions',
     corporateName: 'Tech Solutions Ltda',
-    billingCnpj: '12.345.678/0001-10',
+    billingCnpj: '2B.C3D.4E5/6F7G-89',
     branchCode: 'SP-MOEMA',
     address: 'Rua Funchal, 200 - São Paulo/SP',
     contactName: 'Carlos Andrade',
@@ -188,7 +188,7 @@ export const data: DataType[] = [
     phone: '(11) 98765-4321',
     requestorName: 'Carlos Andrade',
     requestEmail: 'form@techsolutions.com',
-    service: 'Alvará de Funcionamento',
+    service: 'Alvará de funcionamento, ...e mais 3 serviços.',
     scope: 'Matriz + 2 filiais (TI/serviços)',
     stageMode: 'Emissão',
     areaM2: 1200,
@@ -209,7 +209,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'BioPharma',
     corporateName: 'BioPharma Brasil',
-    billingCnpj: '22.333.444/0001-88',
+    billingCnpj: '3C.D4E.5F6/7G8H-10',
     branchCode: 'CPN-LAB01',
     address: 'Av. Barão de Itapura, 900 - Campinas/SP',
     contactName: 'Pedro Lima',
@@ -218,7 +218,7 @@ export const data: DataType[] = [
     phone: '(19) 3777-5566',
     requestorName: 'Pedro Lima',
     requestEmail: 'projetos@biopharma.com',
-    service: 'Vigilância Sanitária',
+    service: 'Vigilância sanitária, ...e mais 2 serviços.',
     scope: 'Renovação de alvará sanitário (laboratório P&D)',
     stageMode: 'Renovação',
     areaM2: 2500,
@@ -239,7 +239,7 @@ export const data: DataType[] = [
     sediUnit: 'PE',
     company: 'TransLog',
     corporateName: 'TransLog Transportes',
-    billingCnpj: '77.888.999/0001-44',
+    billingCnpj: '4D.E5F.6G7/8H9J-21',
     branchCode: 'REC-GALPÃOA',
     address: 'BR-232, km 12 - Recife/PE',
     contactName: 'Beatriz Martins',
@@ -248,7 +248,7 @@ export const data: DataType[] = [
     phone: '(81) 97777-8888',
     requestorName: 'Beatriz Martins',
     requestEmail: 'suprimentos@translog.com',
-    service: 'Corpo de Bombeiros (AVCB)',
+    service: 'AVCB (Corpo de Bombeiros), ...e mais 5 serviços.',
     scope: 'Projeto e AVCB para galpão logístico',
     stageMode: 'Projeto + Emissão',
     areaM2: 5000,
@@ -269,7 +269,7 @@ export const data: DataType[] = [
     sediUnit: 'RS',
     company: 'Green Ambiental',
     corporateName: 'Green Ambiental',
-    billingCnpj: '88.999.000/0001-55',
+    billingCnpj: '5E.F6G.7H8/9J1K-32',
     branchCode: 'POA-CENTRO',
     address: 'Av. Ipiranga, 350 - Porto Alegre/RS',
     contactName: 'Eduardo Ramos',
@@ -278,7 +278,7 @@ export const data: DataType[] = [
     phone: '(51) 3232-9090',
     requestorName: 'Eduardo Ramos',
     requestEmail: 'compras@greenambiental.com',
-    service: 'Cadastro Técnico Federal (CTF/IBAMA)',
+    service: 'Cadastro Técnico Federal (CTF/IBAMA), ...e mais 1 serviço.',
     scope: 'Inclusão de atividades e atualização cadastral',
     stageMode: 'Atualização',
     areaM2: 800,
@@ -299,7 +299,7 @@ export const data: DataType[] = [
     sediUnit: 'CE',
     company: 'Energia Solar Plus',
     corporateName: 'Energia Solar Plus',
-    billingCnpj: '44.555.666/0001-11',
+    billingCnpj: '6F.G7H.8J9/1K2L-43',
     branchCode: 'FOR-USINA3',
     address: 'Av. Beira Mar, 1200 - Fortaleza/CE',
     contactName: 'Rafael Souza',
@@ -308,7 +308,7 @@ export const data: DataType[] = [
     phone: '(85) 3344-7788',
     requestorName: 'Rafael Souza',
     requestEmail: 'contato@esolarplus.com',
-    service: 'Licença de Operação (LO)',
+    service: 'Licença de operação (LO), ...e mais 3 serviços.',
     scope: 'Renovação de LO usina FV 3 MWp',
     stageMode: 'Renovação',
     areaM2: 12000,
@@ -329,7 +329,7 @@ export const data: DataType[] = [
     sediUnit: 'BA',
     company: 'Food Service Brasil',
     corporateName: 'Food Service Brasil',
-    billingCnpj: '55.666.777/0001-22',
+    billingCnpj: '7G.H8J.9K1/2L3M-54',
     branchCode: 'SSA-MATRIZ',
     address: 'Av. Tancredo Neves, 1000 - Salvador/BA',
     contactName: 'Amanda Costa',
@@ -338,7 +338,7 @@ export const data: DataType[] = [
     phone: '(71) 95555-0000',
     requestorName: 'Amanda Costa',
     requestEmail: 'lp-agua@foodbr.com',
-    service: 'Outorga de Uso de Água',
+    service: 'Outorga de uso de água, ...e mais 2 serviços.',
     scope: 'Regularização de 1 poço artesiano',
     stageMode: 'Emissão',
     areaM2: 650,
@@ -359,7 +359,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'EducaMais Online',
     corporateName: 'EducaMais Online',
-    billingCnpj: '66.777.888/0001-33',
+    billingCnpj: '8H.J9K.1L2/3M4N-65',
     branchCode: 'SP-ESTÚDIO',
     address: 'Rua Vergueiro, 800 - São Paulo/SP',
     contactName: 'João Oliveira',
@@ -368,7 +368,7 @@ export const data: DataType[] = [
     phone: '(11) 91212-3434',
     requestorName: 'João Oliveira',
     requestEmail: 'contato@educamais.com',
-    service: 'Alvará de Funcionamento',
+    service: 'Alvará de funcionamento, ...e mais 4 serviços.',
     scope: 'Unidade EAD + estúdio de gravação',
     stageMode: 'Emissão',
     areaM2: 300,
@@ -389,7 +389,7 @@ export const data: DataType[] = [
     sediUnit: 'MG',
     company: 'Construmax',
     corporateName: 'Construmax Engenharia',
-    billingCnpj: '11.222.333/0001-77',
+    billingCnpj: '9J.K1L.2M3/4N5P-76',
     branchCode: 'BH-OBRAS',
     address: 'Av. Afonso Pena, 1234 - Belo Horizonte/MG',
     contactName: 'Fernanda Rocha',
@@ -398,7 +398,7 @@ export const data: DataType[] = [
     phone: '(31) 99888-1234',
     requestorName: 'Fernanda Rocha',
     requestEmail: 'orcamentos@construmax.com.br',
-    service: 'AVCB + Projeto de Incêndio',
+    service: 'AVCB + projeto de incêndio, ...e mais 3 serviços.',
     scope: 'Escritório + canteiro de obras',
     stageMode: 'Projeto + Emissão',
     areaM2: 1800,
@@ -419,7 +419,7 @@ export const data: DataType[] = [
     sediUnit: 'PR',
     company: 'Moda & Estilo',
     corporateName: 'Moda & Estilo LTDA',
-    billingCnpj: '33.444.555/0001-99',
+    billingCnpj: '1K.2L3M.4N5/6P7Q-87',
     branchCode: 'CTBA-LOJA1',
     address: 'Rua XV de Novembro, 250 - Curitiba/PR',
     contactName: 'Juliana Mendes',
@@ -428,7 +428,7 @@ export const data: DataType[] = [
     phone: '(41) 91234-5678',
     requestorName: 'Juliana Mendes',
     requestEmail: 'faleconosco@modaestilo.com',
-    service: 'Licença de Publicidade',
+    service: 'Licença de publicidade, ...e mais 2 serviços.',
     scope: 'Outdoors + frontlight (3 pontos)',
     stageMode: 'Emissão',
     areaM2: 420,
@@ -449,7 +449,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'Finance Group',
     corporateName: 'Finance Group S/A',
-    billingCnpj: '99.000.111/0001-66',
+    billingCnpj: '2L.3M4N.5P6/7Q8R-98',
     branchCode: 'SP-CENTRO',
     address: 'Av. Paulista, 1000 - São Paulo/SP',
     contactName: 'Tatiane Alves',
@@ -458,7 +458,7 @@ export const data: DataType[] = [
     phone: '(11) 4002-8922',
     requestorName: 'Tatiane Alves',
     requestEmail: 'compras@financegroup.com',
-    service: 'Mudança de Endereço',
+    service: 'Mudança de endereço (alvarás), ...e mais 4 serviços.',
     scope: 'Transferência de alvarás e sanitário',
     stageMode: 'Atualização',
     areaM2: 900,
@@ -479,7 +479,7 @@ export const data: DataType[] = [
     sediUnit: 'SC',
     company: 'Mega Indústria',
     corporateName: 'Mega Indústria Metalúrgica',
-    billingCnpj: '10.111.222/0001-77',
+    billingCnpj: '3M.4N5P.6Q7/8R9S-09',
     branchCode: 'JVL-PLANTA',
     address: 'Rua Dona Francisca, 5000 - Joinville/SC',
     contactName: 'Lucas Pereira',
@@ -488,7 +488,7 @@ export const data: DataType[] = [
     phone: '(47) 98888-5555',
     requestorName: 'Lucas Pereira',
     requestEmail: 'facilities@megaind.com',
-    service: 'Renovação de Licenças',
+    service: 'Renovação de licenças, ...e mais 3 serviços.',
     scope: 'Ambiental + Sanitária planta fabril',
     stageMode: 'Renovação',
     areaM2: 8000,
@@ -509,7 +509,7 @@ export const data: DataType[] = [
     sediUnit: 'RJ',
     company: 'Travel Tour',
     corporateName: 'Travel Tour Viagens',
-    billingCnpj: '20.222.333/0001-88',
+    billingCnpj: '4N.5P6Q.7R8/9S1T-19',
     branchCode: 'RJ-COPAC',
     address: 'Av. Atlântica, 3000 - Rio de Janeiro/RJ',
     contactName: 'Renata Carvalho',
@@ -518,7 +518,7 @@ export const data: DataType[] = [
     phone: '(21) 97676-1212',
     requestorName: 'Renata Carvalho',
     requestEmail: 'contato@traveltour.com',
-    service: 'Enquadramento CNAE x Licenças',
+    service: 'Enquadramento CNAE x licenças, ...e mais 2 serviços.',
     scope: 'Revisão de CNAEs e exigências',
     stageMode: 'Diagnóstico',
     areaM2: 350,
@@ -539,7 +539,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'Saúde & Vida',
     corporateName: 'Saúde & Vida',
-    billingCnpj: '30.333.444/0001-99',
+    billingCnpj: '5P.6Q7R.8S9/1T2U-29',
     branchCode: 'SP-CLIN1',
     address: 'Rua Haddock Lobo, 210 - São Paulo/SP',
     contactName: 'Gustavo Nogueira',
@@ -548,7 +548,7 @@ export const data: DataType[] = [
     phone: '(11) 91111-2222',
     requestorName: 'Gustavo Nogueira',
     requestEmail: 'compras@saudevida.com',
-    service: 'Alvará Sanitário (clínica)',
+    service: 'Alvará sanitário (clínica), ...e mais 5 serviços.',
     scope: 'Adequações + protocolo',
     stageMode: 'Emissão',
     areaM2: 420,
@@ -569,7 +569,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'AutoCenter',
     corporateName: 'AutoCenter Brasil',
-    billingCnpj: '40.444.555/0001-11',
+    billingCnpj: '6Q.7R8S.9T1/2U3V-39',
     branchCode: 'CPQ-LOJA',
     address: 'Av. Andrade Neves, 150 - Campinas/SP',
     contactName: 'Paula Ferreira',
@@ -578,7 +578,7 @@ export const data: DataType[] = [
     phone: '(19) 98888-1111',
     requestorName: 'Paula Ferreira',
     requestEmail: 'gestao@autocenter.com',
-    service: 'AVCB + Treinamento de Brigada',
+    service: 'AVCB + treinamento de brigada, ...e mais 2 serviços.',
     scope: 'Loja e oficina mecânica',
     stageMode: 'Projeto + Emissão',
     areaM2: 600,
@@ -599,7 +599,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'SmartHome',
     corporateName: 'SmartHome Solutions',
-    billingCnpj: '50.555.666/0001-22',
+    billingCnpj: '7R.8S9T.1U2/3V4W-49',
     branchCode: 'SP-HQ',
     address: 'Rua Gomes de Carvalho, 1500 - São Paulo/SP',
     contactName: 'Ricardo Almeida',
@@ -608,7 +608,7 @@ export const data: DataType[] = [
     phone: '(11) 95555-9999',
     requestorName: 'Ricardo Almeida',
     requestEmail: 'financeiro@smarthome.com',
-    service: 'Conformidade/Certificação (INMETRO)',
+    service: 'Conformidade/Certificação (INMETRO), ...e mais 3 serviços.',
     scope: 'Avaliação de requisitos de serviços',
     stageMode: 'Diagnóstico',
     areaM2: 950,
@@ -629,7 +629,7 @@ export const data: DataType[] = [
     sediUnit: 'SC',
     company: 'Pet Lovers',
     corporateName: 'Pet Lovers',
-    billingCnpj: '60.666.777/0001-33',
+    billingCnpj: '8S.9T1U.2V3/4W5X-59',
     branchCode: 'FLN-CENTRO',
     address: 'Av. Beira-Mar Norte, 400 - Florianópolis/SC',
     contactName: 'Carla Souza',
@@ -638,7 +638,7 @@ export const data: DataType[] = [
     phone: '(48) 97777-4444',
     requestorName: 'Carla Souza',
     requestEmail: 'adm@petlovers.com',
-    service: 'Alvará + Sanitário',
+    service: 'Alvará + sanitário, ...e mais 2 serviços.',
     scope: 'Loja + banho e tosa',
     stageMode: 'Emissão',
     areaM2: 320,
@@ -659,7 +659,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'ImobiReal',
     corporateName: 'ImobiReal Consultoria',
-    billingCnpj: '70.777.888/0001-44',
+    billingCnpj: '9T.1U2V.3W4/5X6Y-69',
     branchCode: 'SP-VLN',
     address: 'Rua dos Pinheiros, 400 - São Paulo/SP',
     contactName: 'André Barbosa',
@@ -668,7 +668,7 @@ export const data: DataType[] = [
     phone: '(11) 93333-8888',
     requestorName: 'André Barbosa',
     requestEmail: 'compras@imobireal.com',
-    service: 'Licença de Publicidade',
+    service: 'Licença de publicidade, ...e mais 1 serviço.',
     scope: 'Letreiro luminoso de fachada',
     stageMode: 'Emissão',
     areaM2: 270,
@@ -689,7 +689,7 @@ export const data: DataType[] = [
     sediUnit: 'SP',
     company: 'StartUpX',
     corporateName: 'StartUpX Inovação',
-    billingCnpj: '80.888.999/0001-55',
+    billingCnpj: '1U.2V3W.4X5/6Y7Z-79',
     branchCode: 'SP-CWK',
     address: 'Rua Augusta, 2500 - São Paulo/SP',
     contactName: 'Sofia Lima',
@@ -698,7 +698,7 @@ export const data: DataType[] = [
     phone: '(11) 92222-1111',
     requestorName: 'Sofia Lima',
     requestEmail: 'ops@startupx.com',
-    service: 'AVCB + Plano de Emergência',
+    service: 'AVCB + plano de emergência, ...e mais 3 serviços.',
     scope: 'Coworking e data room',
     stageMode: 'Projeto + Emissão',
     areaM2: 700,
@@ -719,7 +719,7 @@ export const data: DataType[] = [
     sediUnit: 'AM',
     company: 'Global Import',
     corporateName: 'Global Import Export',
-    billingCnpj: '90.999.000/0001-66',
+    billingCnpj: '2V.3W4X.5Y6/7Z8A-89',
     branchCode: 'MAO-DIST',
     address: 'Av. Torquato Tapajós, 2000 - Manaus/AM',
     contactName: 'Henrique Duarte',
@@ -728,7 +728,7 @@ export const data: DataType[] = [
     phone: '(92) 91111-9999',
     requestorName: 'Henrique Duarte',
     requestEmail: 'compras@globalimport.com',
-    service: 'Autorização MTR (resíduos)',
+    service: 'Autorização MTR (resíduos), ...e mais 2 serviços.',
     scope: 'Geração e transporte classe II',
     stageMode: 'Emissão',
     areaM2: 1300,
@@ -742,6 +742,7 @@ export const data: DataType[] = [
     servicesSelected: ['Cadastro no sistema', 'Protocolo de autorização', 'Relatório final'],
   },
 ];
+
 
 /** === Expandable Row config === */
 export const expandable: TableProps<DataType>['expandable'] = {
@@ -757,12 +758,3 @@ export const expandable: TableProps<DataType>['expandable'] = {
   ),
   rowExpandable: (record) => record.servicesSelected?.length > 0,
 };
-
-/** === Exemplo de uso ===
-<Table
-  columns={columns}
-  dataSource={data}
-  expandable={expandable}
-  rowKey="numeroFSP"
-/>
-*/

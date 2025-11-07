@@ -4,22 +4,34 @@ import type { TableProps } from 'antd';
 
 export interface DataType {
   key: string;
+  customerNumber: string;
   company: string;
   cnpj: string;
   segment: string;
   filial: string;
   contact: string;
-  phone: string;
-  email: string;
   status: string[];
+  contractType: 'LPU' | 'Manutenção' | 'Avulso';
+  contractTerm: '12 meses' | '36 meses' | 'Indeterminado';
   createdAt: string;
 }
 
 export const columns: TableProps<DataType>['columns'] = [
   {
+    title: 'Nº do cliente',
+    dataIndex: 'customerNumber',
+    key: 'customerNumber',
+    render(value) {
+      return <Tag color='default' bordered={false}>{value}</Tag>;
+    },
+  },
+  {
     title: 'Empresa',
     dataIndex: 'company',
     key: 'company',
+    render(value) {
+      return <span className='font-semibold'>{value}</span>;
+    },
   },
   {
     title: 'CNPJ',
@@ -42,37 +54,18 @@ export const columns: TableProps<DataType>['columns'] = [
     key: 'contact',
   },
   {
-    title: 'Telefone',
-    dataIndex: 'phone',
-    key: 'phone',
-  },
-  {
-    title: 'Email',
-    dataIndex: 'email',
-    key: 'email',
-  },
-  {
     title: 'Status',
     key: 'status',
     dataIndex: 'status',
     render: (_, { status }) => (
       <>
         {status.map((tag) => {
-          let color = 'blue';
-          if (tag === 'Ativo') {
-            color = 'green';
-          }
+          let color = 'green';
           if (tag === 'Inativo') {
             color = 'volcano';
           }
-          if (tag === 'Potencial') {
-            color = 'geekblue';
-          }
-          if (tag === 'Negociando') {
-            color = 'orange';
-          }
           return (
-            <Tag color={color} key={tag}>
+            <Tag color={color} key={tag} bordered={false}>
               {tag}
             </Tag>
           );
@@ -80,256 +73,298 @@ export const columns: TableProps<DataType>['columns'] = [
       </>
     ),
   },
-    {
-      title: "Criado em",
-      key: "createdAt",
-      dataIndex: "createdAt",
-			render(value, record, index) {
-				return (<span>{new Date(value).toLocaleDateString()}</span>
-				);
-			},
+
+  {
+    title: 'Tipo de contrato',
+    dataIndex: 'contractType',
+    key: 'contractType',
+    render: (type) => {
+      let color = 'blue';
+      if (type === 'Manutenção') color = 'geekblue';
+      if (type === 'Avulso') color = 'orange';
+      return <Tag color={color} bordered={false}>{type}</Tag>;
     },
+  },
+  {
+    title: 'Prazo de contrato',
+    dataIndex: 'contractTerm',
+    key: 'contractTerm',
+    render: (term) => {
+      let color = 'green';
+      if (term === '36 meses') color = 'purple';
+      if (term === 'Indeterminado') color = 'default';
+      return <Tag color={color} bordered={false}>{term}</Tag>;
+    },
+  },
+  {
+    title: 'Criado em',
+    key: 'createdAt',
+    dataIndex: 'createdAt',
+    render(value) {
+      return <span>{new Date(value).toLocaleDateString()}</span>;
+    },
+  },
 ];
 
 export const data: DataType[] = [
   {
     key: '1',
+    customerNumber: 'CL-25-0001',
     company: 'Tech Solutions Ltda',
-    cnpj: '12.345.678/0001-10',
+    cnpj: '12.345.678/0001-10', // simples
     segment: 'Tecnologia',
     filial: 'São Paulo',
     contact: 'Mariana Silva',
-    phone: '(11) 98765-4321',
-    email: 'contato@techsolutions.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'LPU',
+    contractTerm: '12 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '2',
+    customerNumber: 'CL-25-0002',
     company: 'AgroVida S/A',
-    cnpj: '98.765.432/0001-55',
+    cnpj: '1A.B2C.3D4/5E6F-78', // alfanumérico
     segment: 'Agronegócio',
     filial: 'Ribeirão Preto',
     contact: 'Carlos Andrade',
-    phone: '(16) 3232-1000',
-    email: 'vendas@agrovida.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Manutenção',
+    contractTerm: '36 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '3',
+    customerNumber: 'CL-25-0003',
     company: 'Construmax Engenharia',
-    cnpj: '11.222.333/0001-77',
+    cnpj: '11.222.333/0001-77', // simples
     segment: 'Construção Civil',
     filial: 'Belo Horizonte',
     contact: 'Fernanda Rocha',
-    phone: '(31) 99888-1234',
-    email: 'contato@construmax.com.br',
-    status: ['Negociando'],
-    createdAt: "2025-08-10T14:35:00Z",
+    status: ['Ativo'], // era Negociando
+    contractType: 'Avulso',
+    contractTerm: 'Indeterminado',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '4',
+    customerNumber: 'CL-25-0004',
     company: 'BioPharma Brasil',
-    cnpj: '22.333.444/0001-88',
+    cnpj: '2B.C3D.4E5/6F7G-89', // alfanumérico
     segment: 'Farmacêutico',
     filial: 'Campinas',
     contact: 'Pedro Lima',
-    phone: '(19) 3777-5566',
-    email: 'suporte@biopharma.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'LPU',
+    contractTerm: '12 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '5',
+    customerNumber: 'CL-25-0005',
     company: 'Moda & Estilo LTDA',
-    cnpj: '33.444.555/0001-99',
+    cnpj: '33.444.555/0001-99', // simples
     segment: 'Varejo',
     filial: 'Curitiba',
     contact: 'Juliana Mendes',
-    phone: '(41) 91234-5678',
-    email: 'atendimento@modaestilo.com',
-    status: ['Potencial'],
-    createdAt: "2025-08-10T14:35:00Z",
+    status: ['Inativo'], // era Potencial
+    contractType: 'Manutenção',
+    contractTerm: '36 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '6',
+    customerNumber: 'CL-25-0006',
     company: 'Energia Solar Plus',
-    cnpj: '44.555.666/0001-11',
+    cnpj: '3C.D4E.5F6/7G8H-10', // alfanumérico
     segment: 'Energia',
     filial: 'Fortaleza',
     contact: 'Rafael Souza',
-    phone: '(85) 3344-7788',
-    email: 'contato@esolarplus.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Avulso',
+    contractTerm: 'Indeterminado',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '7',
+    customerNumber: 'CL-25-0007',
     company: 'Food Service Brasil',
-    cnpj: '55.666.777/0001-22',
+    cnpj: '55.666.777/0001-22', // simples
     segment: 'Alimentício',
     filial: 'Salvador',
     contact: 'Amanda Costa',
-    phone: '(71) 95555-0000',
-    email: 'comercial@foodbr.com',
-    status: ['Negociando'],
-    createdAt: "2025-08-10T14:35:00Z",
+    status: ['Ativo'], // era Negociando
+    contractType: 'LPU',
+    contractTerm: '12 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '8',
+    customerNumber: 'CL-25-0008',
     company: 'EducaMais Online',
-    cnpj: '66.777.888/0001-33',
+    cnpj: '4D.E5F.6G7/8H9J-21', // alfanumérico
     segment: 'Educação',
     filial: 'São Paulo',
     contact: 'João Oliveira',
-    phone: '(11) 91212-3434',
-    email: 'suporte@educamais.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Manutenção',
+    contractTerm: '36 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '9',
+    customerNumber: 'CL-25-0009',
     company: 'TransLog Transportes',
-    cnpj: '77.888.999/0001-44',
+    cnpj: '77.888.999/0001-44', // simples
     segment: 'Logística',
     filial: 'Recife',
     contact: 'Beatriz Martins',
-    phone: '(81) 97777-8888',
-    email: 'logistica@translog.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Avulso',
+    contractTerm: 'Indeterminado',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '10',
+    customerNumber: 'CL-25-0010',
     company: 'Green Ambiental',
-    cnpj: '88.999.000/0001-55',
+    cnpj: '5E.F6G.7H8/9J1K-32', // alfanumérico
     segment: 'Sustentabilidade',
     filial: 'Porto Alegre',
     contact: 'Eduardo Ramos',
-    phone: '(51) 3232-9090',
-    email: 'contato@greenambiental.com',
-    status: ['Potencial'],
-    createdAt: "2025-08-10T14:35:00Z",
+    status: ['Inativo'], // era Potencial
+    contractType: 'LPU',
+    contractTerm: '12 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '11',
+    customerNumber: 'CL-25-0011',
     company: 'Finance Group S/A',
-    cnpj: '99.000.111/0001-66',
+    cnpj: '99.000.111/0001-66', // simples
     segment: 'Financeiro',
     filial: 'São Paulo',
     contact: 'Tatiane Alves',
-    phone: '(11) 4002-8922',
-    email: 'relacionamento@financegroup.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Manutenção',
+    contractTerm: '36 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '12',
+    customerNumber: 'CL-25-0012',
     company: 'Mega Indústria Metalúrgica',
-    cnpj: '10.111.222/0001-77',
+    cnpj: '6F.G7H.8J9/1K2L-43', // alfanumérico
     segment: 'Indústria',
     filial: 'Joinville',
     contact: 'Lucas Pereira',
-    phone: '(47) 98888-5555',
-    email: 'faleconosco@megaind.com',
     status: ['Inativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Avulso',
+    contractTerm: 'Indeterminado',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '13',
+    customerNumber: 'CL-25-0013',
     company: 'Travel Tour Viagens',
-    cnpj: '20.222.333/0001-88',
+    cnpj: '20.222.333/0001-88', // simples
     segment: 'Turismo',
     filial: 'Rio de Janeiro',
     contact: 'Renata Carvalho',
-    phone: '(21) 97676-1212',
-    email: 'reservas@traveltour.com',
-    status: ['Negociando'],
-    createdAt: "2025-08-10T14:35:00Z",
+    status: ['Ativo'], // era Negociando
+    contractType: 'LPU',
+    contractTerm: '12 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '14',
+    customerNumber: 'CL-25-0014',
     company: 'Saúde & Vida',
-    cnpj: '30.333.444/0001-99',
+    cnpj: '7G.H8J.9K1/2L3M-54', // alfanumérico
     segment: 'Saúde',
     filial: 'São Paulo',
     contact: 'Gustavo Nogueira',
-    phone: '(11) 91111-2222',
-    email: 'contato@saudevida.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Manutenção',
+    contractTerm: '36 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '15',
+    customerNumber: 'CL-25-0015',
     company: 'AutoCenter Brasil',
-    cnpj: '40.444.555/0001-11',
+    cnpj: '40.444.555/0001-11', // simples
     segment: 'Automotivo',
     filial: 'Campinas',
     contact: 'Paula Ferreira',
-    phone: '(19) 98888-1111',
-    email: 'vendas@autocenter.com',
-    status: ['Potencial'],
-    createdAt: "2025-08-10T14:35:00Z",
+    status: ['Inativo'], // era Potencial
+    contractType: 'Avulso',
+    contractTerm: 'Indeterminado',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '16',
+    customerNumber: 'CL-25-0016',
     company: 'SmartHome Solutions',
-    cnpj: '50.555.666/0001-22',
+    cnpj: '8H.J9K.1L2/3M4N-65', // alfanumérico
     segment: 'Tecnologia',
     filial: 'São Paulo',
     contact: 'Ricardo Almeida',
-    phone: '(11) 95555-9999',
-    email: 'atendimento@smarthome.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'LPU',
+    contractTerm: '12 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '17',
+    customerNumber: 'CL-25-0017',
     company: 'Pet Lovers',
-    cnpj: '60.666.777/0001-33',
+    cnpj: '60.666.777/0001-33', // simples
     segment: 'Pet Shop',
     filial: 'Florianópolis',
     contact: 'Carla Souza',
-    phone: '(48) 97777-4444',
-    email: 'contato@petlovers.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Manutenção',
+    contractTerm: '36 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '18',
+    customerNumber: 'CL-25-0018',
     company: 'ImobiReal Consultoria',
-    cnpj: '70.777.888/0001-44',
+    cnpj: '9J.K1L.2M3/4N5P-76', // alfanumérico
     segment: 'Imobiliário',
     filial: 'São Paulo',
     contact: 'André Barbosa',
-    phone: '(11) 93333-8888',
-    email: 'negocios@imobireal.com',
-    status: ['Negociando'],
-    createdAt: "2025-08-10T14:35:00Z",
+    status: ['Ativo'], // era Negociando
+    contractType: 'Avulso',
+    contractTerm: 'Indeterminado',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '19',
+    customerNumber: 'CL-25-0019',
     company: 'StartUpX Inovação',
-    cnpj: '80.888.999/0001-55',
+    cnpj: '80.888.999/0001-55', // simples
     segment: 'Startups',
     filial: 'São Paulo',
     contact: 'Sofia Lima',
-    phone: '(11) 92222-1111',
-    email: 'hello@startupx.com',
     status: ['Ativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'LPU',
+    contractTerm: '12 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
   {
     key: '20',
+    customerNumber: 'CL-25-0020',
     company: 'Global Import Export',
-    cnpj: '90.999.000/0001-66',
+    cnpj: '1K.2L3M.4N5/6P7Q-87', // alfanumérico
     segment: 'Comércio Exterior',
     filial: 'Manaus',
     contact: 'Henrique Duarte',
-    phone: '(92) 91111-9999',
-    email: 'contato@globalimport.com',
     status: ['Inativo'],
-    createdAt: "2025-08-10T14:35:00Z",
+    contractType: 'Manutenção',
+    contractTerm: '36 meses',
+    createdAt: '2025-08-10T14:35:00Z',
   },
 ];
