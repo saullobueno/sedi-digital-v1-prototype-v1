@@ -35,7 +35,7 @@ const STATUS_OPCOES = ["Ativo", "Inativo", "Potencial", "Negociando"] as const;
 const ReceivableList: React.FC = () => {
 	const [dataSource, setDataSource] = useState<DataType[]>(data);
 	const [drawerOpen, setDrawerOpen] = useState(false);
-	const [selected, setSelected] = useState<DataType | null>(null);
+	const [selected, setSelected] = useState<any>(null);
 	const [form] = Form.useForm<DataType>();
 
 	useEffect(() => {
@@ -56,7 +56,7 @@ const ReceivableList: React.FC = () => {
 		setTimeout(() => setSelected(null), 200);
 	};
 
-	const salvar = async () => {
+	const handleSave: any = async () => {
 		try {
 			const values = await form.validateFields();
 			setDataSource(prev =>
@@ -64,7 +64,7 @@ const ReceivableList: React.FC = () => {
 			);
 			message.success("Cliente atualizado com sucesso!");
 			fecharDrawer();
-		} catch {}
+		} catch { }
 	};
 
 	const empty = useMemo(() => dataSource.length === 0, [dataSource]);
@@ -76,11 +76,11 @@ const ReceivableList: React.FC = () => {
 				className='my-4 text-2xl font-semibold'
 			/>
 			<Content className="p-4 m-0 bg-white rounded-lg border border-solid border-neutral-200">
-					<OptionsToolbar />
-					<div className="max-h-[calc(100vh-230px)] overflow-y-scroll rounded-lg border border-solid border-neutral-200">
-						<Table<DataType>
-							sticky={true}
-							rowKey="key"
+				<OptionsToolbar />
+				<div className="max-h-[calc(100vh-230px)] overflow-y-scroll rounded-lg border border-solid border-neutral-200">
+					<Table<DataType>
+						sticky={true}
+						rowKey="key"
 						columns={[
 							...((columns ?? []) as TableColumnsType<DataType>),
 							{
@@ -94,14 +94,14 @@ const ReceivableList: React.FC = () => {
 								),
 							}
 						]}
-							dataSource={data}
-							size="small"
-							scroll={{ x: "max-content" }}
-							pagination={false}
-						/>
-					</div>
+						dataSource={data}
+						size="small"
+						scroll={{ x: "max-content" }}
+						pagination={false}
+					/>
+				</div>
 			</Content>
-			
+
 			{/* Drawer com formulário de edição */}
 			<Drawer
 				title={selected ? `Editar cliente: ${selected.invoiceNumber}` : "Editar cliente"}
@@ -112,7 +112,7 @@ const ReceivableList: React.FC = () => {
 				destroyOnClose
 				extra={
 					<Space>
-						<Button type="primary" icon={<SaveOutlined />} onClick={salvar}>
+						<Button type="primary" icon={<SaveOutlined />} onClick={handleSave}>
 							Salvar
 						</Button>
 					</Space>

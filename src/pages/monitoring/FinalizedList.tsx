@@ -64,7 +64,7 @@ const FinalizedList: React.FC = () => {
 			);
 			message.success("Cliente atualizado com sucesso!");
 			fecharDrawer();
-		} catch {}
+		} catch { }
 	};
 
 	const empty = useMemo(() => dataSource.length === 0, [dataSource]);
@@ -76,11 +76,11 @@ const FinalizedList: React.FC = () => {
 				className='my-4 text-2xl font-semibold'
 			/>
 			<Content className="p-4 m-0 bg-white rounded-lg border border-solid border-neutral-200">
-					<OptionsToolbar />
-					<div className="max-h-[calc(100vh-230px)] overflow-y-scroll rounded-lg border border-solid border-neutral-200">
-						<Table<DataType>
-							sticky={true}
-							rowKey="key"
+				<OptionsToolbar />
+				<div className="max-h-[calc(100vh-230px)] overflow-y-scroll rounded-lg border border-solid border-neutral-200">
+					<Table<DataType>
+						sticky={true}
+						rowKey="key"
 						columns={[
 							...((columns ?? []) as TableColumnsType<DataType>),
 							{
@@ -94,14 +94,14 @@ const FinalizedList: React.FC = () => {
 								),
 							}
 						]}
-							dataSource={data}
-							size="small"
-							scroll={{ x: "max-content" }}
-							pagination={false}
-						/>
-					</div>
+						dataSource={data}
+						size="small"
+						scroll={{ x: "max-content" }}
+						pagination={false}
+					/>
+				</div>
 			</Content>
-			
+
 			{/* Drawer com formulário de edição */}
 			<Drawer
 				title={selected ? `Editar cliente: ${selected.numeroFSP}` : "Editar cliente"}
