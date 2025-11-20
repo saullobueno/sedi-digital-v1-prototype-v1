@@ -72,7 +72,7 @@ const FinalizedList: React.FC = () => {
 	return (
 		<>
 			<Breadcrumb
-				items={[{ title: 'Inicio' }, { title: 'Acompanhamento' }, { title: 'Finalizados' }]}
+				items={[{ title: 'Inicio' }, { title: 'Financeiro' }, { title: 'Finalizados' }]}
 				className='my-4 text-2xl font-semibold'
 			/>
 			<Content className="p-4 m-0 bg-white rounded-lg border border-solid border-neutral-200">

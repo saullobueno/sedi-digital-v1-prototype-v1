@@ -73,7 +73,7 @@ const ProtocolsList: React.FC = () => {
 	return (
 		<>
 			<Breadcrumb
-				items={[{ title: 'Inicio' }, { title: 'Execução' }, { title: 'Protocolos' }]}
+				items={[{ title: 'Inicio' }, { title: 'Operacional' }, { title: 'Concluídos' }]}
 				className='my-4 text-2xl font-semibold'
 			/>
 			<Content className="p-4 m-0 bg-white rounded-lg border border-solid border-neutral-200">
