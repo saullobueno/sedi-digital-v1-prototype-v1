@@ -1,4 +1,4 @@
-// DrawerRegister.tsx
+// ServiceOrderDrawer.tsx
 import React, { useEffect, useState } from "react";
 import {
 	Drawer,
@@ -25,6 +25,7 @@ import {
 	Flex,
 	Popconfirm,
 	message,
+	Collapse,
 } from "antd";
 import {
 	SaveOutlined,
@@ -32,20 +33,25 @@ import {
 	InboxOutlined,
 	PlusOutlined,
 } from "@ant-design/icons";
+import dayjs from "dayjs";
 
 import type { DataType } from "../../data/proposals/fsp";
+
+import ClientDrawer from "./ClientDrawer";
+import BillingDrawer, { BillingContext } from "./BillingDrawer";
+import { mockInitialValues } from "./mockInitialValues";
 
 const gutter = 32;
 const colSpan = 12;
 
-interface DrawerPropsRegister {
+interface ServiceOrderDrawerProps {
 	open: boolean;
 	selected: DataType | null;
 	onClose: () => void;
 	onSave: (values: any) => void;
 }
 
-const DrawerRegister: React.FC<DrawerPropsRegister> = ({
+const ServiceOrderDrawer: React.FC<ServiceOrderDrawerProps> = ({
 	open,
 	selected,
 	onClose,
@@ -54,12 +60,50 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 	const [form] = Form.useForm<any>();
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 	const [editingIndex, setEditingIndex] = useState<number | null>(null);
+	const [timelineDrafts, setTimelineDrafts] = useState<Record<string, string>>({});
+
+	const [isClientDrawerOpen, setIsClientDrawerOpen] = useState(false);
+	const [isBillingDrawerOpen, setIsBillingDrawerOpen] = useState(false);
+	const [billingContext, setBillingContext] = useState<BillingContext | null>(
+		null
+	);
 
 	useEffect(() => {
 		if (selected) {
 			form.setFieldsValue({ ...selected } as any);
 		} else {
 			form.resetFields();
+			// Serviço de exemplo com dois processos simulados
+			form.setFieldsValue({
+				services: [
+					{
+						serviceName: "Serviço exemplo",
+						processes: [
+							{
+								processo: "Processo 1",
+								execucao: "Execução 1",
+							},
+							{
+								processo: "Processo 2",
+								execucao: "Execução 2",
+							},
+						],
+					},
+				],
+			});
+		}
+	}, [selected, form]);
+
+	useEffect(() => {
+		if (selected) {
+			// Se vier algo do backend / tabela, mescla com os mocks
+			form.setFieldsValue({
+				...mockInitialValues,
+				...selected,
+			});
+		} else {
+			form.resetFields();
+			form.setFieldsValue(mockInitialValues);
 		}
 	}, [selected, form]);
 
@@ -70,13 +114,46 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 			message.success("Cliente atualizado com sucesso!");
 			onClose();
 		} catch {
-			// validação falhou, não faz nada
+			// validação falhou
 		}
 	};
+	const formatDateOrRange = (value: any): string => {
+		if (!value) return "—";
+
+		// Range de datas
+		if (Array.isArray(value)) {
+			const parts = value
+				.filter(Boolean)
+				.map((v) => (v?.format ? v.format("YYYY-MM-DD") : String(v)));
+			return parts.join(" até ");
+		}
+
+		// Uma única data (Dayjs ou string)
+		if (value?.format) {
+			return value.format("YYYY-MM-DD");
+		}
+
+		return String(value);
+	};
+	const formatDateTime = (value: any): string => {
+		if (!value) return "—";
+
+		if (value?.format) {
+			return value.format("YYYY-MM-DD HH:mm");
+		}
+
+		const d = dayjs(value);
+		if (d.isValid()) {
+			return d.format("YYYY-MM-DD HH:mm");
+		}
+
+		return String(value);
+	};
+
 
 	return (
 		<Drawer
-			title={selected ? `${selected.numeroFSP}` : "Cliente"}
+			title={selected ? `${selected.numeroFSP}` : "Ordem de Serviço"}
 			placement="right"
 			closable={{
 				placement: "end",
@@ -101,7 +178,7 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 				</Space>
 			}
 		>
-			{/* Um único Form envolvendo todas as abas para manter state/validação */}
+			{/* Form único envolvendo tudo (Tabs + Drawers filhos) */}
 			<Form
 				layout="horizontal"
 				variant="filled"
@@ -113,7 +190,6 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 				colon={false}
 				wrapperCol={{ span: "auto" }}
 				requiredMark={false}
-				initialValues={selected ?? {}}
 			>
 				<Tabs
 					defaultActiveKey="resumo"
@@ -130,16 +206,25 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 											<Card>
 												<Statistic
 													title="Status atual"
-													valueRender={() => (
-														<Space>
-															{(form.getFieldValue("status") ?? ["Novo"]).map(
-																(s: string) => (
+													valueRender={() => {
+														const rawStatus = form.getFieldValue("status");
+
+														const statusArray = Array.isArray(rawStatus)
+															? rawStatus
+															: rawStatus
+																? [rawStatus]
+																: ["Novo"];
+
+														return (
+															<Space>
+																{statusArray.map((s: string) => (
 																	<Tag key={s}>{s}</Tag>
-																)
-															)}
-														</Space>
-													)}
+																))}
+															</Space>
+														);
+													}}
 												/>
+
 											</Card>
 										</Col>
 
@@ -185,7 +270,7 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 														{form.getFieldValue("sediUnit") || "—"}
 													</Descriptions.Item>
 													<Descriptions.Item label="Prazo conclusão">
-														{form.getFieldValue("prazoConclusao") || "—"}
+														{formatDateOrRange(form.getFieldValue("prazoConclusao"))}
 													</Descriptions.Item>
 													<Descriptions.Item label="Condição de pagamento">
 														{form.getFieldValue([
@@ -203,20 +288,36 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 													Serviços e Processos
 												</Typography.Title>
 
-												<Flex gap={8} vertical>
-													<Card>
-														<div className="font-semibold">Serviço 1</div>
-														<div>Processo 1</div>
-														<div>Processo 2</div>
-														<div>Processo 3</div>
-													</Card>
-													<Card>
-														<div className="font-semibold">Serviço 2</div>
-														<div>Processo 1</div>
-														<div>Processo 2</div>
-														<div>Processo 3</div>
-													</Card>
-												</Flex>
+												<Form.Item noStyle shouldUpdate>
+													{() => {
+														const services: any[] = form.getFieldValue("services") || [];
+
+														// filtra possíveis undefined
+														const safeServices = services.filter(Boolean);
+
+														return (
+															<Flex gap={8} vertical>
+																{safeServices.map((srv: any, index: number) => {
+																	const processes = srv?.processes || [];
+																	return (
+																		<Card key={index}>
+																			<div className="font-semibold">
+																				{srv?.serviceName || `Serviço ${index + 1}`}
+																			</div>
+																			{processes.map((p: any, pIndex: number) => (
+																				<div key={pIndex}>
+																					{p?.processo || `Processo ${pIndex + 1}`}
+																				</div>
+																			))}
+																		</Card>
+																	);
+																})}
+															</Flex>
+														);
+													}}
+												</Form.Item>
+
+
 											</Card>
 										</Col>
 									</Row>
@@ -224,7 +325,7 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 							),
 						},
 
-						// ===== OS (Pedidos + PROPOSTA unificadas) =====
+						// ===== OS (Status + Dados da OS + Cliente) =====
 						{
 							key: "os",
 							label: "OS",
@@ -240,10 +341,9 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 											<Form.Item
 												name="status"
 												label="Status"
-												valuePropName="checked"
+												initialValue="Em execução" // ou "Não iniciada" / o que você quiser
 											>
 												<Select
-													defaultValue="Não iniciada"
 													options={[
 														{ label: "Novo", value: "Novo" },
 														{ label: "Aguardando aprovação do cliente", value: "Aguardando aprovação do cliente" },
@@ -263,6 +363,7 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 													]}
 												/>
 											</Form.Item>
+
 										</Col>
 										<Col span={colSpan}>
 											<Form.Item
@@ -271,7 +372,6 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 												valuePropName="checked"
 											>
 												<Select
-													defaultValue="Criada"
 													options={[
 														{ label: "Criada", value: "Criada" },
 														{ label: "Sem resposta", value: "Sem resposta" },
@@ -279,11 +379,20 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 														{ label: "Divergências", value: "Divergências" },
 														{ label: "Falha", value: "Falha" },
 														{ label: "Duplicidade", value: "Duplicidade" },
-														{ label: "Faturamento errado", value: "Faturamento errado" },
-														{ label: "Precisa ser revisado", value: "Precisa ser revisado" },
+														{
+															label: "Faturamento errado",
+															value: "Faturamento errado",
+														},
+														{
+															label: "Precisa ser revisado",
+															value: "Precisa ser revisado",
+														},
 														{ label: "Cancelado", value: "Cancelado" },
 														{ label: "Finlizado", value: "Finlizado" },
-														{ label: "Informação em falta", value: "Informação em falta" },
+														{
+															label: "Informação em falta",
+															value: "Informação em falta",
+														},
 														{ label: "Empresa fechada", value: "Empresa fechada" },
 														{ label: "Recriado", value: "Recriado" },
 														{ label: "Orçamento", value: "Orçamento" },
@@ -321,12 +430,18 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 
 										<Col span={colSpan}>
 											<Form.Item name="requestDate" label="Solicitação">
-												<DatePicker placeholder="YYYY-MM-DD" className="w-full" />
+												<DatePicker
+													placeholder="YYYY-MM-DD"
+													className="w-full"
+												/>
 											</Form.Item>
 										</Col>
 										<Col span={colSpan}>
 											<Form.Item name="dataAprovTexto" label="Aprovação">
-												<DatePicker placeholder="YYYY-MM-DD" className="w-full" />
+												<DatePicker
+													placeholder="YYYY-MM-DD"
+													className="w-full"
+												/>
 											</Form.Item>
 										</Col>
 
@@ -343,12 +458,18 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 
 										<Col span={colSpan}>
 											<Form.Item name="startTime" label="Início">
-												<DatePicker placeholder="YYYY-MM-DD" className="w-full" />
+												<DatePicker
+													placeholder="YYYY-MM-DD"
+													className="w-full"
+												/>
 											</Form.Item>
 										</Col>
 										<Col span={colSpan}>
 											<Form.Item name="endTime" label="Conclusão">
-												<DatePicker placeholder="YYYY-MM-DD" className="w-full" />
+												<DatePicker
+													placeholder="YYYY-MM-DD"
+													className="w-full"
+												/>
 											</Form.Item>
 										</Col>
 
@@ -375,6 +496,26 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 										</Typography.Title>
 
 										<Row gutter={gutter}>
+
+											<Col span={colSpan}>
+												<Form.Item
+													name="company"
+													label="Empresa"
+													rules={[
+														{
+															required: true,
+															message: "Informe o nome da empresa",
+														},
+													]}
+												>
+													<Input placeholder="Ex.: Tech Solutions Ltda" />
+												</Form.Item>
+											</Col>
+											<Col span={colSpan}>
+												<Form.Item name="corporateName" label="Razão Social">
+													<Input />
+												</Form.Item>
+											</Col>
 											<Col span={24}>
 												<Form.Item
 													name="isMatriz"
@@ -430,83 +571,127 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 												<Form.Item
 													name="requestEmail"
 													label="E-mail solicitação"
-													rules={[{ type: "email", message: "Email inválido" }]}
+													rules={[
+														{ type: "email", message: "Email inválido" },
+													]}
 												>
 													<Input />
 												</Form.Item>
 											</Col>
 										</Row>
+
+										<Row gutter={gutter} className="mt-2">
+											<Col span={24} className="flex justify-end">
+												<Typography.Link
+													onClick={() => setIsClientDrawerOpen(true)}
+												>
+													Ver detalhes completos do cliente
+												</Typography.Link>
+											</Col>
+										</Row>
 									</div>
+								</>
+							),
+						},
 
-									<Col span={24}>
-										<Divider className="mb-8" />
-									</Col>
+						// ===== SERVIÇOS (apenas serviços e processos) =====
+						{
+							key: "servicos",
+							label: "Serviços e Processos",
+							className: "p-4",
+							children: (
+								<div className="mt-2">
+									<Typography.Title level={5} className="mb-6">
+										Serviços e processos
+									</Typography.Title>
 
-									{/* SERVIÇOS + PROCESSOS (UNIFICADO) */}
-									<div className="mt-6">
-										<Typography.Title level={5} className="mb-6">
-											Serviços e processos
-										</Typography.Title>
-
-										<Form.List name="services">
-											{(serviceFields, { add: addService, remove: removeService }) => (
-												<>
-													{serviceFields.map((serviceField, index) => (
-														<Card
-															key={serviceField.key}
-															className="mb-4 shadow-sm border rounded-2xl"
-															title={`Serviço ${index + 1}`}
-															extra={
-																<Button
-																	danger
-																	type="text"
-																	icon={<DeleteOutlined />}
-																	onClick={() => removeService(serviceField.name)}
+									<Form.List name="services">
+										{(serviceFields, { add: addService, remove: removeService }) => (
+											<>
+												{serviceFields.map((serviceField, index) => (
+													<Card
+														key={serviceField.key}
+														className="mb-4 shadow-sm border rounded-2xl"
+														title={`Serviço ${index + 1}`}
+														extra={
+															<Button
+																danger
+																type="text"
+																icon={<DeleteOutlined />}
+																onClick={() => removeService(serviceField.name)}
+															>
+																Remover serviço
+															</Button>
+														}
+													>
+														<Row gutter={gutter}>
+															<Col span={24}>
+																<Form.Item
+																	name={[serviceField.name, "serviceName"]}
+																	label="Serviço"
+																	rules={[
+																		{
+																			required: true,
+																			message: "Informe o serviço",
+																		},
+																	]}
 																>
-																	Remover serviço
-																</Button>
-															}
-														>
-															<Row gutter={gutter}>
-																<Col span={24}>
-																	<Form.Item
-																		name={[serviceField.name, "serviceName"]}
-																		label="Serviço"
-																		rules={[
-																			{
-																				required: true,
-																				message: "Informe o serviço",
-																			},
-																		]}
-																	>
-																		<Input placeholder="Serviço" />
-																	</Form.Item>
-																</Col>
-																<Col span={24}>
-																	<Form.Item name="address" label="Endereço de execução">
-																		<Input />
-																	</Form.Item>
-																</Col>
-																<Col span={24}>
-																	<Form.Item
-																		name={[serviceField.name, "observacoes"]}
-																		label="Observações"
-																	>
-																		<Input.TextArea rows={3} />
-																	</Form.Item>
-																</Col>
-															</Row>
+																	<Input placeholder="Serviço" />
+																</Form.Item>
+															</Col>
+															<Col span={24}>
+																<Form.Item
+																	name={[serviceField.name, "address"]}
+																	label="Endereço de execução"
+																>
+																	<Input />
+																</Form.Item>
+															</Col>
+															<Col span={24}>
+																<Form.Item
+																	name={[serviceField.name, "observacoes"]}
+																	label="Observações"
+																>
+																	<Input.TextArea rows={3} />
+																</Form.Item>
+															</Col>
+														</Row>
 
-															{/* PROCESSOS DO SERVIÇO */}
-															<Form.List name={[serviceField.name, "processes"]}>
-																{(processFields, { add: addProcess, remove: removeProcess }) => (
-																	<>
-																		<Typography.Text className="font-semibold">
-																			Processos deste serviço
-																		</Typography.Text>
-																		<Row gutter={gutter} className="mt-2">
-																			{processFields.map((processField, pIndex) => (
-																				<Col span={24} className="mt-2" key={processField.key}>
+														{/* PROCESSOS DO SERVIÇO COMO ACCORDION */}
+														<Form.List name={[serviceField.name, "processes"]}>
+															{(processFields, { add: addProcess, remove: removeProcess }) => (
+																<>
+																	<Typography.Text className="font-semibold">
+																		Processos deste serviço
+																	</Typography.Text>
+
+																	<Collapse accordion className="mt-3">
+																		{processFields.map((processField, pIndex) => {
+																			const processPath: (string | number)[] = [
+																				"services",
+																				serviceField.name,
+																				"processes",
+																				processField.name,
+																			];
+																			const processValue = form.getFieldValue(processPath) || {};
+
+																			return (
+																				<Collapse.Panel
+																					key={processField.key}
+																					header={
+																						<div className="flex flex-col">
+																							<span>
+																								{processValue.processo ||
+																									`Processo ${pIndex + 1}`}
+																							</span>
+																							{processValue.status && (
+																								<Typography.Text type="secondary">
+																									Status: {processValue.status}
+																								</Typography.Text>
+																							)}
+																						</div>
+																					}
+																				>
 																					<Row gutter={gutter} className="mt-2">
 																						<Col span={24}>
 																							<Form.Item
@@ -580,29 +765,51 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 																						</Col>
 																						<Col span={colSpan}>
 																							<Form.Item
-																								name="status"
+																								name={[processField.name, "status"]}
 																								label="Status"
-																								valuePropName="checked"
 																							>
 																								<Select
-																									defaultValue="Não iniciada"
 																									options={[
+																										{ label: "Novo", value: "Novo" },
+																										{
+																											label: "Aguardando aprovação do cliente",
+																											value: "Aguardando aprovação do cliente",
+																										},
+																										{
+																											label: "Aprovado pelo cliente",
+																											value: "Aprovado pelo cliente",
+																										},
+																										{
+																											label: "Reprovado pelo cliente",
+																											value: "Reprovado pelo cliente",
+																										},
+																										{ label: "Preparado", value: "Preparado" },
 																										{
 																											label: "Não iniciada",
 																											value: "Não iniciada",
 																										},
+																										{ label: "Em análise", value: "Em análise" },
+																										{ label: "Em execução", value: "Em execução" },
+																										{ label: "Em revisão", value: "Em revisão" },
+																										{ label: "Concluído", value: "Concluído" },
+																										{ label: "Arquivado", value: "Arquivado" },
+																										{ label: "A faturar", value: "A faturar" },
+																										{
+																											label: "Em faturamento",
+																											value: "Em faturamento",
+																										},
+																										{ label: "Faturado", value: "Faturado" },
+																										{ label: "Cancelado", value: "Cancelado" },
 																									]}
 																								/>
 																							</Form.Item>
 																						</Col>
 																						<Col span={colSpan}>
 																							<Form.Item
-																								name="upload"
+																								name={[processField.name, "upload"]}
 																								label="Item repositório"
-																								valuePropName="checked"
 																							>
 																								<Select
-																									defaultValue="Alvará dos Bombeiros"
 																									options={[
 																										{
 																											label: "Alvará dos Bombeiros",
@@ -620,9 +827,241 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 																								<Input.TextArea rows={3} />
 																							</Form.Item>
 																						</Col>
+
+																						{/* LINK DE FATURAMENTO */}
+																						<Col span={24}>
+																							<Typography.Link
+																								onClick={() => {
+																									setBillingContext({
+																										serviceIndex: serviceField.name as number,
+																										processIndex: processField.name as number,
+																									});
+																									setIsBillingDrawerOpen(true);
+																								}}
+																							>
+																								Ver faturamento do processo
+																							</Typography.Link>
+																						</Col>
+
+																						{/* LINHA DE TEMPO */}
+																						<Col span={24}>
+																							<Divider className="my-4" />
+
+																							<Form.List name={[processField.name, "timeline"]}>
+																								{(timelineFields, { add: addTimelineItem }) => {
+																									const draftKey = `${serviceField.name}-${processField.name}`;
+																									const hasDraft = Object.prototype.hasOwnProperty.call(
+																										timelineDrafts,
+																										draftKey
+																									);
+																									const newDescription = timelineDrafts[draftKey] ?? "";
+
+																									return (
+																										<Form.Item
+																											noStyle
+																											shouldUpdate={(prev, cur) => prev.services !== cur.services}
+																										>
+																											{() => (
+																												<>
+																													<Typography.Title
+																														level={5}
+																														style={{ fontSize: 14, marginBottom: 12 }}
+																													>
+																														Linha de tempo
+																													</Typography.Title>
+
+																													{/* LISTA DE AÇÕES EXISTENTES */}
+																													{timelineFields.length === 0 && (
+																														<Typography.Text type="secondary">
+																															Nenhuma ação registrada ainda.
+																														</Typography.Text>
+																													)}
+
+																													{timelineFields.map((timelineField, tIndex) => {
+																														const actionPath: (string | number)[] = [
+																															"services",
+																															serviceField.name,
+																															"processes",
+																															processField.name,
+																															"timeline",
+																															timelineField.name,
+																														];
+																														const action = form.getFieldValue(actionPath) || {};
+																														const isFinished =
+																															action.status === "Concluído" ||
+																															action.status === "Cancelado" ||
+																															!!action.finishedAt;
+
+																														return (
+																															<Card
+																																key={timelineField.key}
+																																size="small"
+																																className="mb-2"
+																																bodyStyle={{ padding: 12 }}
+																															>
+																																<div className="flex justify-between gap-4 items-start">
+																																	{/* ESQUERDA: DESCRIÇÃO + DATAS */}
+																																	<div className="flex-1">
+																																		<Typography.Text strong delete={isFinished}>
+																																			{action.description || `Ação ${tIndex + 1}`}
+																																		</Typography.Text>
+
+																																		<div className="flex flex-col">
+																																			<Typography.Text type="secondary">
+																																				Criado em: {formatDateTime(action.createdAt)}
+																																			</Typography.Text>
+
+																																			{action.finishedAt && (
+																																				<Typography.Text type="secondary">
+																																					{action.status === "Cancelado"
+																																						? "Cancelado em: "
+																																						: "Concluído em: "}
+																																					{formatDateTime(action.finishedAt)}
+																																				</Typography.Text>
+																																			)}
+																																		</div>
+																																	</div>
+
+																																	{/* DIREITA: STATUS + SELECT */}
+																																	<div style={{ minWidth: 220 }}>
+																																		<Form.Item
+																																			name={[timelineField.name, "status"]}
+																																			className="mb-0"
+																																		>
+																																			<Select
+																																				disabled={isFinished}
+																																				options={[
+																																					{ label: "Pendente", value: "Pendente" },
+																																					{ label: "Em andamento", value: "Em andamento" },
+																																					{ label: "Concluído", value: "Concluído" },
+																																					{ label: "Atrasado", value: "Atrasado" },
+																																					{ label: "Aguardando", value: "Aguardando" },
+																																					{ label: "Cancelado", value: "Cancelado" },
+																																				]}
+																																				onChange={(value) => {
+																																					const current =
+																																						form.getFieldValue(actionPath) || {};
+
+																																					// aqui a gente só garante o finishedAt,
+																																					// o status já é controlado pelo próprio Form.Item
+																																					if (
+																																						(value === "Concluído" ||
+																																							value === "Cancelado") &&
+																																						!current.finishedAt
+																																					) {
+																																						form.setFieldValue(actionPath, {
+																																							...current,
+																																							status: value,
+																																							finishedAt: dayjs(),
+																																						});
+																																					} else {
+																																						form.setFieldValue(actionPath, {
+																																							...current,
+																																							status: value,
+																																						});
+																																					}
+																																				}}
+																																			/>
+																																		</Form.Item>
+																																	</div>
+																																</div>
+																															</Card>
+																														);
+																													})}
+
+																													<Divider />
+
+																													{/* NOVA AÇÃO */}
+																													{!hasDraft && (
+																														<Button
+																															type="dashed"
+																															icon={<PlusOutlined />}
+																															onClick={() =>
+																																setTimelineDrafts((prev) => ({
+																																	...prev,
+																																	[draftKey]: "",
+																																}))
+																															}
+																														>
+																															Nova ação
+																														</Button>
+																													)}
+
+																													{hasDraft && (
+																														<>
+																															<Typography.Title
+																																level={5}
+																																style={{ fontSize: 14, marginBottom: 8 }}
+																															>
+																																Nova ação
+																															</Typography.Title>
+
+																															<Input.TextArea
+																																rows={3}
+																																placeholder="Descreva a ação realizada ou a realizar"
+																																value={newDescription}
+																																onChange={(e) =>
+																																	setTimelineDrafts((prev) => ({
+																																		...prev,
+																																		[draftKey]: e.target.value,
+																																	}))
+																																}
+																															/>
+
+																															<Space className="mt-2">
+																																<Button
+																																	type="primary"
+																																	onClick={() => {
+																																		if (!newDescription || !newDescription.trim()) {
+																																			message.warning(
+																																				"Informe a descrição da nova ação antes de adicionar."
+																																			);
+																																			return;
+																																		}
+
+																																		addTimelineItem({
+																																			createdAt: dayjs(),
+																																			status: "Pendente",
+																																			description: newDescription.trim(),
+																																		});
+
+																																		setTimelineDrafts((prev) => {
+																																			const clone = { ...prev };
+																																			delete clone[draftKey];
+																																			return clone;
+																																		});
+																																	}}
+																																>
+																																	Adicionar ação
+																																</Button>
+																																<Button
+																																	onClick={() =>
+																																		setTimelineDrafts((prev) => {
+																																			const clone = { ...prev };
+																																			delete clone[draftKey];
+																																			return clone;
+																																		})
+																																	}
+																																>
+																																	Cancelar
+																																</Button>
+																															</Space>
+																														</>
+																													)}
+																												</>
+																											)}
+																										</Form.Item>
+																									);
+																								}}
+																							</Form.List>
+																						</Col>
+
+
+
+																						{/* REMOVER PROCESSO */}
 																						<Col
-																							span={2}
-																							className="flex items-end justify-center pb-1"
+																							span={24}
+																							className="flex items-center justify-end mt-2"
 																						>
 																							<Button
 																								danger
@@ -631,478 +1070,205 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 																								onClick={() =>
 																									removeProcess(processField.name)
 																								}
-																							/>
-																						</Col>
-																						<Col span={24}>
-																							<Divider />
+																							>
+																								Remover processo
+																							</Button>
 																						</Col>
 																					</Row>
-																				</Col>
-																			))}
+																				</Collapse.Panel>
+																			);
+																		})}
+																	</Collapse>
 
-																			<Col span={24}>
-																				<Button
-																					type="dashed"
-																					icon={<PlusOutlined />}
-																					onClick={() => addProcess()}
-																					className="mt-2"
-																				>
-																					Adicionar processo
-																				</Button>
-																			</Col>
-																		</Row>
-																	</>
-																)}
-															</Form.List>
-														</Card>
-													))}
+																	<Button
+																		type="dashed"
+																		icon={<PlusOutlined />}
+																		onClick={() =>
+																			addProcess({
+																				processo: "",
+																				execucao: "",
+																				orgao: "",
+																				valor: undefined,
+																				observacoes: "",
+																				timeline: [],
+																			})
+																		}
+																		className="mt-3"
+																	>
+																		Adicionar processo
+																	</Button>
+																</>
+															)}
+														</Form.List>
+													</Card>
+												))}
 
-													<Button
-														type="dashed"
-														icon={<PlusOutlined />}
-														onClick={() => addService()}
-													>
-														Adicionar serviço
-													</Button>
-												</>
-											)}
-										</Form.List>
-									</div>
-
-									<Col span={24}>
-										<Divider className="my-8" />
-									</Col>
-
-									{/* AVALIAÇÃO / CUSTOS (SEM FATURAMENTO) */}
-									<div className="mt-6">
-										<Typography.Title level={5} className="mb-6">
-											Avaliação e detalhes
-										</Typography.Title>
-
-										<Row gutter={gutter}>
-											<Col span={colSpan}>
-												<Form.Item
-													name="grauDificuldade"
-													label="Dificuldade"
+												<Button
+													type="dashed"
+													icon={<PlusOutlined />}
+													onClick={() =>
+														addService({
+															serviceName: "",
+															address: "",
+															observacoes: "",
+															processes: [],
+														})
+													}
 												>
-													<Input placeholder="Grau de Dificuldade" />
-												</Form.Item>
-											</Col>
-
-											<Col span={colSpan}>
-												<Form.Item name="grauUrgencia" label="Urgência">
-													<Input placeholder="Grau de Urgência" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="impactoSeNaoResolver"
-													label="Impacto"
-												>
-													<Input placeholder="Impacto se não resolver" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="alternativaSedi"
-													label="Concorrência"
-												>
-													<Input placeholder="Alternativa à SÉDI (Concorrência)" />
-												</Form.Item>
-											</Col>
-
-											<Col span={colSpan}>
-												<Form.Item
-													name="capacidadeFinanceira"
-													label="Capacidade Financeira"
-												>
-													<Input placeholder="Capacidade Financeira" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="previsaoGastosTransporte"
-													label="Gastos com transporte"
-												>
-													<Input placeholder="Previsão gastos com transporte" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="previsaoGastosViagem"
-													label="Gastos com viagem"
-												>
-													<Input placeholder="Gastos com viagem" />
-												</Form.Item>
-											</Col>
-
-											<Col span={colSpan}>
-												<Form.Item
-													name="gastosTerceiros"
-													label="Gastos com terceiros"
-												>
-													<Input placeholder="Gastos com terceiros" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="previsaoGastosTaxas"
-													label="Gastos com taxas"
-												>
-													<Input placeholder="Previsão de gastos com taxas e emolumentos" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="sugestaoHonorarios"
-													label="Honorários"
-												>
-													<Input placeholder="Sugestão de honorários" />
-												</Form.Item>
-											</Col>
-
-											<Col span={colSpan}>
-												<Form.Item
-													name="montagemProcesso"
-													label="Montagem"
-												>
-													<Input placeholder="Montagem do processo" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="acompanhamento"
-													label="Acompanhamento"
-												>
-													<Input placeholder="" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="permanenciaOrgao"
-													label="Permanência no órgão"
-												>
-													<Input placeholder="Permanência no órgão" />
-												</Form.Item>
-											</Col>
-											<Col span={colSpan}>
-												<Form.Item
-													name="especialista"
-													label="Especialista"
-												>
-													<Input placeholder="" />
-												</Form.Item>
-											</Col>
-
-											<Col span={24}>
-												<Form.Item
-													name="visitaInLoco"
-													label="Visita"
-												>
-													<Input.TextArea
-														rows={4}
-														placeholder="Visita em loco"
-													/>
-												</Form.Item>
-											</Col>
-											<Col span={24}>
-												<Form.Item
-													name="outrasAtividades"
-													label="Outras atividades"
-												>
-													<Input.TextArea
-														rows={4}
-														placeholder="Outras atividades não mencionadas"
-													/>
-												</Form.Item>
-											</Col>
-										</Row>
-									</div>
-								</>
+													Adicionar serviço
+												</Button>
+											</>
+										)}
+									</Form.List>
+								</div>
 							),
 						},
 
-						// ===== CLIENTE =====
+
+						// ===== AVALIAÇÃO / DETALHES (em aba separada) =====
 						{
-							key: "cliente",
-							label: "Cliente",
+							key: "avaliacao",
+							label: "Avaliação e detalhes",
 							className: "p-4",
 							children: (
-								<>
+								<div className="mt-2">
 									<Typography.Title level={5} className="mb-6">
-										Dados
+										Avaliação e detalhes
 									</Typography.Title>
 
 									<Row gutter={gutter}>
 										<Col span={colSpan}>
 											<Form.Item
-												name="company"
-												label="Empresa"
-												rules={[
-													{
-														required: true,
-														message: "Informe o nome da empresa",
-													},
-												]}
+												name="grauDificuldade"
+												label="Dificuldade"
 											>
-												<Input placeholder="Ex.: Tech Solutions Ltda" />
+												<Input placeholder="Grau de Dificuldade" />
+											</Form.Item>
+										</Col>
+
+										<Col span={colSpan}>
+											<Form.Item name="grauUrgencia" label="Urgência">
+												<Input placeholder="Grau de Urgência" />
 											</Form.Item>
 										</Col>
 										<Col span={colSpan}>
 											<Form.Item
-												name="corporateName"
-												label="Razão Social"
+												name="impactoSeNaoResolver"
+												label="Impacto"
 											>
-												<Input />
+												<Input placeholder="Impacto se não resolver" />
 											</Form.Item>
 										</Col>
-										<Col span={24}>
+										<Col span={colSpan}>
 											<Form.Item
-												name="corporateisMatriz"
-												label="Matriz"
-												valuePropName="checked"
+												name="alternativaSedi"
+												label="Concorrência"
 											>
-												<Switch />
+												<Input placeholder="Alternativa à SÉDI (Concorrência)" />
 											</Form.Item>
 										</Col>
 
 										<Col span={colSpan}>
 											<Form.Item
-												name="corporateCNPJMatriz"
-												label="CNPJ Matriz"
+												name="capacidadeFinanceira"
+												label="Capacidade Financeira"
 											>
-												<Input placeholder="1A.B2C.3D4/5E6F-78" />
+												<Input placeholder="Capacidade Financeira" />
+											</Form.Item>
+										</Col>
+										<Col span={colSpan}>
+											<Form.Item
+												name="previsaoGastosTransporte"
+												label="Gastos com transporte"
+											>
+												<Input placeholder="Previsão gastos com transporte" />
+											</Form.Item>
+										</Col>
+										<Col span={colSpan}>
+											<Form.Item
+												name="previsaoGastosViagem"
+												label="Gastos com viagem"
+											>
+												<Input placeholder="Gastos com viagem" />
 											</Form.Item>
 										</Col>
 
 										<Col span={colSpan}>
 											<Form.Item
-												noStyle
-												shouldUpdate={(prev, cur) =>
-													prev.corporateisMatriz !== cur.corporateisMatriz
-												}
+												name="gastosTerceiros"
+												label="Gastos com terceiros"
 											>
-												{({ getFieldValue }) =>
-													!getFieldValue("corporateisMatriz") ? (
-														<Form.Item
-															name="corporateCNPJFilial"
-															label="CNPJ Filial"
-														>
-															<Select placeholder="Selecione o CNPJ da filial">
-																<Select.Option value="1A.B2C.3D4/5E6F-78">
-																	1A.B2C.3D4/5E6F-78
-																</Select.Option>
-																<Select.Option value="9Z.8Y7.6X5/4W3V-21">
-																	9Z.8Y7.6X5/4W3V-21
-																</Select.Option>
-																<Select.Option value="0K.1J2.3H4/5G6F-99">
-																	0K.1J2.3H4/5G6F-99
-																</Select.Option>
-															</Select>
-														</Form.Item>
-													) : null
-												}
+												<Input placeholder="Gastos com terceiros" />
 											</Form.Item>
 										</Col>
-
-										<Col span={24}>
-											<Divider className="mb-8" />
+										<Col span={colSpan}>
+											<Form.Item
+												name="previsaoGastosTaxas"
+												label="Gastos com taxas"
+											>
+												<Input placeholder="Previsão de gastos com taxas e emolumentos" />
+											</Form.Item>
 										</Col>
-
-										<Col span={24}>
-											<Typography.Title level={5} className="mb-6">
-												Contato
-											</Typography.Title>
+										<Col span={colSpan}>
+											<Form.Item
+												name="sugestaoHonorarios"
+												label="Honorários"
+											>
+												<Input placeholder="Sugestão de honorários" />
+											</Form.Item>
 										</Col>
 
 										<Col span={colSpan}>
 											<Form.Item
-												name="phone"
-												label="Telefone"
+												name="montagemProcesso"
+												label="Montagem"
 											>
-												<Input placeholder="(00) 00000-0000" />
+												<Input placeholder="Montagem do processo" />
 											</Form.Item>
 										</Col>
 										<Col span={colSpan}>
 											<Form.Item
-												name="email"
-												label="E-mail contato"
-												rules={[{ type: "email", message: "Email inválido" }]}
+												name="acompanhamento"
+												label="Acompanhamento"
 											>
-												<Input placeholder="contato@empresa.com" />
+												<Input placeholder="" />
 											</Form.Item>
 										</Col>
 										<Col span={colSpan}>
 											<Form.Item
-												name="contactName"
-												label="Contato"
+												name="permanenciaOrgao"
+												label="Permanência no órgão"
 											>
-												<Input placeholder="Nome do contato" />
+												<Input placeholder="Permanência no órgão" />
 											</Form.Item>
 										</Col>
 										<Col span={colSpan}>
-											<Form.Item
-												name="department"
-												label="Departamento"
-											>
-												<Input />
+											<Form.Item name="especialista" label="Especialista">
+												<Input placeholder="" />
 											</Form.Item>
-										</Col>
-										<Col span={24}>
-											<Divider className="mb-8" />
-										</Col>
-										<Col span={24}>
-											<Typography.Title level={5} className="mb-6">
-												Endereço
-											</Typography.Title>
 										</Col>
 
 										<Col span={24}>
-											<Form.Item
-												name="address"
-												label="Endereço"
-											>
-												<Input />
-											</Form.Item>
-										</Col>
-										<Col span={colSpan}>
-											<Form.Item
-												name="cep"
-												label="CEP"
-											>
-												<Input />
-											</Form.Item>
-										</Col>
-										<Col span={colSpan}>
-											<Form.Item
-												name="state"
-												label="Estado"
-											>
-												<Input />
-											</Form.Item>
-										</Col>
-									</Row>
-								</>
-							),
-						},
-
-						// ===== FATURAMENTO =====
-						{
-							key: "faturamento",
-							label: "Faturamento",
-							className: "p-4",
-							children: (
-								<>
-									<Typography.Title level={5} className="mb-6">
-										Dados de Faturamento
-									</Typography.Title>
-
-									<Row gutter={gutter}>
-										<Col span={colSpan}>
-											<Form.Item
-												name="billingCnpj"
-												label="CNPJ faturamento"
-											>
-												<Input placeholder="00.000.000/0000-00" />
-											</Form.Item>
-										</Col>
-										<Col span={colSpan}>
-											<Form.Item
-												name={["billing", "inscricaoEstadual"]}
-												label="Inscrição Estadual"
-											>
-												<Input placeholder="Opcional" />
-											</Form.Item>
-										</Col>
-										<Col span={24}>
-											<Form.Item
-												name={["billing", "enderecoFaturamento"]}
-												label="Endereço de faturamento"
-											>
-												<Input placeholder="Endereço completo para faturamento" />
-											</Form.Item>
-										</Col>
-
-										<Col span={colSpan}>
-											<Form.Item
-												name={["billing", "condicaoPagamento"]}
-												label="Condição de pagamento"
-											>
-												<Select
-													options={[
-														{ label: "À vista", value: "avista" },
-														{ label: "15 dias", value: "15d" },
-														{ label: "30 dias", value: "30d" },
-														{ label: "45 dias", value: "45d" },
-													]}
-													placeholder="Selecione"
-													allowClear
+											<Form.Item name="visitaInLoco" label="Visita">
+												<Input.TextArea
+													rows={4}
+													placeholder="Visita em loco"
 												/>
 											</Form.Item>
 										</Col>
-										<Col span={colSpan}>
-											<Form.Item
-												name={["billing", "meioPagamento"]}
-												label="Meio de pagamento"
-											>
-												<Select
-													options={[
-														{ label: "Boleto", value: "boleto" },
-														{ label: "PIX", value: "pix" },
-														{ label: "Transferência", value: "ted" },
-													]}
-													placeholder="Selecione"
-													allowClear
-												/>
-											</Form.Item>
-										</Col>
-
-										<Col span={colSpan}>
-											<Form.Item
-												name={["billing", "valorTotal"]}
-												label="Valor Total"
-											>
-												<InputNumber
-													className="w-full"
-													placeholder="0,00"
-													formatter={(value: any) =>
-														value != null
-															? `R$ ${value}`.replace(
-																/\B(?=(\d{3})+(?!\d))/g,
-																"."
-															)
-															: ""
-													}
-													parser={(value) =>
-														value
-															?.replace(/\D/g, "")
-															.replace(/^0+/, "") as unknown as number
-													}
-												/>
-											</Form.Item>
-										</Col>
-										<Col span={colSpan}>
-											<Form.Item
-												name="responsavel"
-												label="Responsável comercial"
-											>
-												<Input />
-											</Form.Item>
-										</Col>
-
 										<Col span={24}>
 											<Form.Item
-												name={["billing", "observacoes"]}
-												label="Observações"
+												name="outrasAtividades"
+												label="Outras atividades"
 											>
 												<Input.TextArea
-													rows={3}
-													placeholder="Instruções de faturamento, dados bancários, etc."
+													rows={4}
+													placeholder="Outras atividades não mencionadas"
 												/>
 											</Form.Item>
 										</Col>
 									</Row>
-								</>
+								</div>
 							),
 						},
 
@@ -1132,8 +1298,7 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 														rules={[
 															{
 																required: true,
-																message:
-																	"Selecione pelo menos um arquivo",
+																message: "Selecione pelo menos um arquivo",
 															},
 														]}
 													>
@@ -1341,10 +1506,16 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 																					form.setFieldsValue({
 																						documents: newDocs,
 																					});
-																					message.success("Documento removido.");
+																					message.success(
+																						"Documento removido."
+																					);
 																				}}
 																			>
-																				<Button size="small" type="link" danger>
+																				<Button
+																					size="small"
+																					type="link"
+																					danger
+																				>
 																					Excluir
 																				</Button>
 																			</Popconfirm>,
@@ -1429,8 +1600,7 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 										}}
 										onOk={() => {
 											const editDoc = form.getFieldValue("editDocument");
-											const docs: any[] =
-												form.getFieldValue("documents") || [];
+											const docs: any[] = form.getFieldValue("documents") || [];
 
 											if (editingIndex === null) return;
 
@@ -1526,9 +1696,22 @@ const DrawerRegister: React.FC<DrawerPropsRegister> = ({
 						},
 					]}
 				/>
+
+				{/* DRAWER DE CLIENTE (REUTILIZÁVEL) */}
+				<ClientDrawer
+					open={isClientDrawerOpen}
+					onClose={() => setIsClientDrawerOpen(false)}
+				/>
+
+				{/* DRAWER DE FATURAMENTO POR PROCESSO (REUTILIZÁVEL) */}
+				<BillingDrawer
+					open={isBillingDrawerOpen}
+					onClose={() => setIsBillingDrawerOpen(false)}
+					context={billingContext}
+				/>
 			</Form>
 		</Drawer>
 	);
 };
 
-export default DrawerRegister;
+export default ServiceOrderDrawer;

@@ -39,7 +39,7 @@ import {
 import { data, DataType, columns } from "../../data/proposals/fsp";
 import ActionsDropdown from "../../data/utils/actionsDropdown";
 import OptionsToolbar from "../../components/crud/list/OptionsToolbar";
-import DrawerRegister from "../../components/drawer/DrawerRegister";
+import ServiceOrderDrawer from "../../components/drawer/ServiceOrderDrawer";
 
 const STATUS_OPCOES = ["Ativo", "Inativo", "Potencial", "Negociando"] as const;
 
@@ -120,7 +120,7 @@ const FSPList: React.FC = () => {
 			</Content>
 
 			{/* Drawer com formulário em abas */}
-			<DrawerRegister
+			<ServiceOrderDrawer
 				open={drawerOpen}
 				selected={selected}
 				onClose={fecharDrawer}

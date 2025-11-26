@@ -29,7 +29,7 @@ import {
 import { data, DataType, columns } from "../../data/execution/protocols";
 import ActionsDropdown from "../../data/utils/actionsDropdown";
 import OptionsToolbar from "../../components/crud/list/OptionsToolbar";
-import DrawerRegister from "../../components/drawer/DrawerRegister";
+import ServiceOrderDrawer from "../../components/drawer/ServiceOrderDrawer";
 
 const STATUS_OPCOES = ["Ativo", "Inativo", "Potencial", "Negociando"] as const;
 
@@ -104,7 +104,7 @@ const ProtocolsList: React.FC = () => {
 			</Content>
 
 			{/* Drawer com formulário de edição */}
-			<DrawerRegister
+			<ServiceOrderDrawer
 				open={drawerOpen}
 				selected={selected}
 				onClose={fecharDrawer}
