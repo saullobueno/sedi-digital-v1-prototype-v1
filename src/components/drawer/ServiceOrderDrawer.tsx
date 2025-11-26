@@ -32,6 +32,9 @@ import {
 	DeleteOutlined,
 	InboxOutlined,
 	PlusOutlined,
+	DollarOutlined,
+	BankOutlined,
+	RightOutlined,
 } from "@ant-design/icons";
 import dayjs from "dayjs";
 
@@ -491,9 +494,18 @@ const ServiceOrderDrawer: React.FC<ServiceOrderDrawerProps> = ({
 
 									{/* CLIENTE DENTRO DA ABA OS */}
 									<div className="mt-6">
-										<Typography.Title level={5} className="mb-6">
-											Cliente
-										</Typography.Title>
+										<Flex justify="space-between">
+											<Typography.Title level={5} className="mb-6">
+												Cliente
+											</Typography.Title>
+											<Typography.Link
+												onClick={() => setIsClientDrawerOpen(true)}
+											>
+												Ver detalhes completos do cliente
+												<RightOutlined className="ms-4" />
+											</Typography.Link>
+
+										</Flex>
 
 										<Row gutter={gutter}>
 
@@ -580,15 +592,6 @@ const ServiceOrderDrawer: React.FC<ServiceOrderDrawerProps> = ({
 											</Col>
 										</Row>
 
-										<Row gutter={gutter} className="mt-2">
-											<Col span={24} className="flex justify-end">
-												<Typography.Link
-													onClick={() => setIsClientDrawerOpen(true)}
-												>
-													Ver detalhes completos do cliente
-												</Typography.Link>
-											</Col>
-										</Row>
 									</div>
 								</>
 							),
@@ -830,7 +833,8 @@ const ServiceOrderDrawer: React.FC<ServiceOrderDrawerProps> = ({
 
 																						{/* LINK DE FATURAMENTO */}
 																						<Col span={24}>
-																							<Typography.Link
+																							<Button
+																								icon={<DollarOutlined />}
 																								onClick={() => {
 																									setBillingContext({
 																										serviceIndex: serviceField.name as number,
@@ -840,7 +844,7 @@ const ServiceOrderDrawer: React.FC<ServiceOrderDrawerProps> = ({
 																								}}
 																							>
 																								Ver faturamento do processo
-																							</Typography.Link>
+																							</Button>
 																						</Col>
 
 																						{/* LINHA DE TEMPO */}
