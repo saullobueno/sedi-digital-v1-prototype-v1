@@ -33,7 +33,7 @@ import BillingDrawer from "../../components/drawer/BillingDrawer";
 
 const STATUS_OPCOES = ["Ativo", "Inativo", "Potencial", "Negociando"] as const;
 
-const BillingList: React.FC = () => {
+const BilledList: React.FC = () => {
 	const [dataSource, setDataSource] = useState<DataType[]>(data);
 	const [drawerOpen, setDrawerOpen] = useState(false);
 	const [selected, setSelected] = useState<DataType | null>(null);
@@ -73,7 +73,7 @@ const BillingList: React.FC = () => {
 	return (
 		<>
 			<Breadcrumb
-				items={[{ title: 'Inicio' }, { title: 'Financeiro' }, { title: 'Faturamento' }]}
+				items={[{ title: 'Inicio' }, { title: 'Financeiro' }, { title: 'Faturado' }]}
 				className='my-4 text-2xl font-semibold'
 			/>
 			<Content className="p-4 m-0 bg-white rounded-lg border border-solid border-neutral-200">
@@ -105,6 +105,7 @@ const BillingList: React.FC = () => {
 
 			{/* Drawer com formulário de edição */}
 			<BillingDrawer
+				title='Faturados'
 				open={drawerOpen}
 				onClose={fecharDrawer}
 			/>
@@ -112,4 +113,4 @@ const BillingList: React.FC = () => {
 	);
 }
 
-export default BillingList;
+export default BilledList;

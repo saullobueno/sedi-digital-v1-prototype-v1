@@ -21,161 +21,392 @@ export interface BillingContext {
 }
 
 interface BillingDrawerProps {
+	title?: any;
 	open: boolean;
 	onClose: () => void;
-	context: BillingContext | null;
+	context?: BillingContext | null;
+	createdAt?: string;
+	updatedAt?: string;
 }
 
+const STATUS_OPCOES = [
+	"Pendente",
+	"Faturado",
+	"Atrasado",
+	"Cancelado",
+	"Agendado",
+] as const;
+
+const CONDICAO_PAGAMENTO_OPCOES = [
+	{ label: "À vista", value: "avista" },
+	{ label: "15 dias", value: "15d" },
+	{ label: "30 dias", value: "30d" },
+	{ label: "45 dias", value: "45d" },
+];
+
+const MEIO_PAGAMENTO_OPCOES = [
+	{ label: "Boleto", value: "boleto" },
+	{ label: "PIX", value: "pix" },
+	{ label: "Transferência", value: "ted" },
+];
+
+const RECORRENCIA_OPCOES = [
+	{ label: "Único", value: "unico" },
+	{ label: "Mensal", value: "mensal" },
+	{ label: "Trimestral", value: "trimestral" },
+	{ label: "Anual", value: "anual" },
+];
+
 const BillingDrawer: React.FC<BillingDrawerProps> = ({
+	title = "Faturamento",
 	open,
 	onClose,
 	context,
+	createdAt,
+	updatedAt,
 }) => {
-	if (!context) return null;
-
-	const baseName = [
-		"services",
-		context.serviceIndex,
-		"processes",
-		context.processIndex,
-		"billing",
-	] as (string | number)[];
+	const [form] = Form.useForm<any>();
 
 	return (
 		<Drawer
-			title="Faturamento do processo"
+			title={title}
 			placement="right"
 			width={800}
 			open={open}
 			onClose={onClose}
 			destroyOnClose
-			classNames={{ body: "py-4 px-4" }}
+			classNames={{ body: "p-8" }}
+			closable
 		>
-			<Typography.Title level={5} className="mb-6">
-				Dados de Faturamento
-			</Typography.Title>
+			<Form
+				layout="horizontal"
+				variant="filled"
+				size="small"
+				form={form}
+				labelCol={{ flex: "120px" }}
+				labelAlign="left"
+				labelWrap
+				colon={false}
+				wrapperCol={{ span: "auto" }}
+				requiredMark={false}
+			>
+				{/* STATUS & METADADOS */}
+				<Typography.Title level={5} className="mb-6">
+					Status &amp; Metadados
+				</Typography.Title>
 
-			{/* Info básica do processo (somente leitura) */}
-			<Form.Item noStyle shouldUpdate>
-				{({ getFieldValue }) => {
-					const process = getFieldValue([
-						"services",
-						context.serviceIndex,
-						"processes",
-						context.processIndex,
-					]);
-					return (
-						<div className="mb-6 rounded-xl border px-4 py-3 bg-gray-50">
-							<Typography.Text strong className="block">
-								Serviço {context.serviceIndex + 1} — Processo{" "}
-								{context.processIndex + 1}
-							</Typography.Text>
-							<Typography.Text type="secondary" className="block">
-								{process?.processo || "Sem nome de processo informado"}
-							</Typography.Text>
-						</div>
-					);
-				}}
-			</Form.Item>
+				<Form.Item name="status" label="Status">
+					<Select
+						allowClear
+						placeholder="Selecione status"
+						options={STATUS_OPCOES.map((s) => ({ label: s, value: s }))}
+					/>
+				</Form.Item>
 
-			<Row gutter={gutter}>
-				<Col span={colSpan}>
-					<Form.Item name={[...baseName, "cnpj"]} label="CNPJ para fat.">
-						<Input placeholder="00.000.000/0000-00" />
-					</Form.Item>
-				</Col>
-				<Col span={colSpan}>
-					<Form.Item
-						name={[...baseName, "inscricaoEstadual"]}
-						label="Inscrição Est."
-					>
-						<Input placeholder="Opcional" />
-					</Form.Item>
-				</Col>
+				<Row gutter={gutter}>
+					<Col span={colSpan}>
+						<Form.Item label="Criado em">
+							{createdAt ?? "-"}
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item label="Atualizado em">
+							{updatedAt ?? "-"}
+						</Form.Item>
+					</Col>
+				</Row>
 
-				<Col span={24}>
-					<Form.Item
-						name={[...baseName, "enderecoFaturamento"]}
-						label="Endereço"
-					>
-						<Input placeholder="Endereço completo para faturamento" />
-					</Form.Item>
-				</Col>
+				<Divider className="mb-8" />
 
-				<Col span={colSpan}>
-					<Form.Item
-						name={[...baseName, "condicaoPagamento"]}
-						label="Condição"
-					>
-						<Select
-							options={[
-								{ label: "À vista", value: "avista" },
-								{ label: "15 dias", value: "15d" },
-								{ label: "30 dias", value: "30d" },
-								{ label: "45 dias", value: "45d" },
-							]}
-							placeholder="Selecione"
-							allowClear
-						/>
-					</Form.Item>
-				</Col>
-				<Col span={colSpan}>
-					<Form.Item
-						name={[...baseName, "meioPagamento"]}
-						label="Meio de pag."
-					>
-						<Select
-							options={[
-								{ label: "Boleto", value: "boleto" },
-								{ label: "PIX", value: "pix" },
-								{ label: "Transferência", value: "ted" },
-							]}
-							placeholder="Selecione"
-							allowClear
-						/>
-					</Form.Item>
-				</Col>
+				{/* CLIENTE / TOMADOR */}
+				<Typography.Title level={5} className="mb-6">
+					Cliente / Tomador
+				</Typography.Title>
 
-				<Col span={colSpan}>
-					<Form.Item name={[...baseName, "valor"]} label="Valor">
-						<InputNumber
-							className="w-full"
-							placeholder="0,00"
-							formatter={(value: any) =>
-								value != null
-									? `R$ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
-									: ""
-							}
-							parser={(value) =>
-								value?.replace(/\D/g, "").replace(/^0+/, "") as unknown as number
-							}
-						/>
-					</Form.Item>
-				</Col>
-				<Col span={colSpan}>
-					<Form.Item name={[...baseName, "responsavel"]} label="Responsável">
-						<Input />
-					</Form.Item>
-				</Col>
+				<Row gutter={gutter}>
+					<Col span={colSpan}>
+						<Form.Item name={["razaoSocial"]} label="Razão social">
+							<Input placeholder="Razão social da empresa" />
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item name={["nomeFantasia"]} label="Nome fantasia">
+							<Input placeholder="Opcional" />
+						</Form.Item>
+					</Col>
 
-				<Col span={24}>
-					<Form.Item
-						name={[...baseName, "observacoes"]}
-						label="Observações"
-					>
-						<Input.TextArea
-							rows={3}
-							placeholder="Instruções de faturamento específicas deste processo."
-						/>
-					</Form.Item>
-				</Col>
-			</Row>
+					<Col span={colSpan}>
+						<Form.Item name={["cnpj"]} label="CNPJ">
+							<Input placeholder="00.000.000/0000-00" />
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item
+							name={["inscricaoEstadual"]}
+							label="Inscrição Est."
+						>
+							<Input placeholder="Opcional" />
+						</Form.Item>
+					</Col>
 
-			<Divider />
-			<Typography.Text type="secondary">
-				Este drawer pode ser reutilizado em outras telas, bastando informar o
-				serviço, processo e contexto de faturamento.
-			</Typography.Text>
+					<Col span={colSpan}>
+						<Form.Item
+							name={["inscricaoMunicipal"]}
+							label="Inscrição Mun."
+						>
+							<Input placeholder="Opcional" />
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item
+							name={["codigoClienteInterno"]}
+							label="Cód. cliente"
+						>
+							<Input placeholder="Código interno (ERP)" />
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item name={["enderecoCep"]} label="CEP">
+							<Input placeholder="00000-000" />
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item name={["enderecoCidade"]} label="Cidade">
+							<Input />
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item name={["enderecoUf"]} label="UF">
+							<Input maxLength={2} placeholder="UF" />
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item name={["enderecoBairro"]} label="Bairro">
+							<Input />
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item name={["enderecoLogradouro"]} label="Endereço">
+							<Input placeholder="Rua / Av." />
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item name={["enderecoNumero"]} label="Número">
+							<Input />
+						</Form.Item>
+					</Col>
+
+					<Col span={24}>
+						<Form.Item
+							name={["enderecoComplemento"]}
+							label="Complemento"
+						>
+							<Input placeholder="Sala, bloco, referência, etc." />
+						</Form.Item>
+					</Col>
+				</Row>
+
+				<Divider className="mb-8" />
+
+				{/* CONDIÇÕES COMERCIAIS */}
+				<Typography.Title level={5} className="mb-6">
+					Condições comerciais
+				</Typography.Title>
+
+				<Row gutter={gutter}>
+					<Col span={colSpan}>
+						<Form.Item
+							name={["condicaoPagamento"]}
+							label="Condição"
+						>
+							<Select
+								options={CONDICAO_PAGAMENTO_OPCOES}
+								placeholder="Selecione"
+								allowClear
+							/>
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item
+							name={["meioPagamento"]}
+							label="Meio de pag."
+						>
+							<Select
+								options={MEIO_PAGAMENTO_OPCOES}
+								placeholder="Selecione"
+								allowClear
+							/>
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item name={["valor"]} label="Valor">
+							<InputNumber
+								className="w-full"
+								placeholder="0,00"
+								formatter={(value: any) =>
+									value != null
+										? `R$ ${value}`.replace(
+											/\B(?=(\d{3})+(?!\d))/g,
+											"."
+										)
+										: ""
+								}
+								parser={(value) =>
+									value
+										?.replace(/\D/g, "")
+										.replace(/^0+/, "") as unknown as number
+								}
+							/>
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item name={["recorrencia"]} label="Recorrência">
+							<Select
+								options={RECORRENCIA_OPCOES}
+								placeholder="Selecione"
+								allowClear
+							/>
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item
+							name={["vencimentoDia"]}
+							label="Dia vencimento"
+						>
+							<InputNumber
+								min={1}
+								max={31}
+								className="w-full"
+								placeholder="1–31"
+							/>
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item
+							name={["descontoPercentual"]}
+							label="Desconto (%)"
+						>
+							<InputNumber
+								min={0}
+								max={100}
+								className="w-full"
+								placeholder="0"
+							/>
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item
+							name={["jurosAoMes"]}
+							label="Juros/mês (%)"
+						>
+							<InputNumber
+								min={0}
+								className="w-full"
+								placeholder="0"
+							/>
+						</Form.Item>
+					</Col>
+				</Row>
+
+				<Divider className="mb-8" />
+
+				{/* CONTROLE INTERNO */}
+				<Typography.Title level={5} className="mb-6">
+					Controle interno
+				</Typography.Title>
+
+				<Row gutter={gutter}>
+					<Col span={colSpan}>
+						<Form.Item name={["centroCusto"]} label="Centro de custo">
+							<Input />
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item name={["projeto"]} label="Projeto / Processo">
+							<Input />
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item name={["poCliente"]} label="PO do cliente">
+							<Input />
+						</Form.Item>
+					</Col>
+					<Col span={colSpan}>
+						<Form.Item
+							name={["referenciaContrato"]}
+							label="Ref. contrato"
+						>
+							<Input />
+						</Form.Item>
+					</Col>
+				</Row>
+
+				<Divider className="mb-8" />
+
+				{/* CONTATO PARA COBRANÇA */}
+				<Typography.Title level={5} className="mb-6">
+					Contato para cobrança
+				</Typography.Title>
+
+				<Row gutter={gutter}>
+					<Col span={colSpan}>
+						<Form.Item name={["responsavel"]} label="Responsável">
+							<Input />
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item
+							name={["emailCobranca"]}
+							label="E-mail cobrança"
+						>
+							<Input
+								type="email"
+								placeholder="financeiro@cliente.com"
+							/>
+						</Form.Item>
+					</Col>
+
+					<Col span={colSpan}>
+						<Form.Item
+							name={["telefoneCobranca"]}
+							label="Telefone"
+						>
+							<Input placeholder="(00) 0000-0000" />
+						</Form.Item>
+					</Col>
+				</Row>
+
+				<Divider className="mb-8" />
+
+				{/* OBSERVAÇÕES */}
+				<Typography.Title level={5} className="mb-6">
+					Observações
+				</Typography.Title>
+
+				<Row gutter={gutter}>
+					<Col span={24}>
+						<Form.Item
+							name={["observacoes"]}
+							label="Observações"
+						>
+							<Input.TextArea
+								rows={3}
+								placeholder="Instruções de faturamento específicas deste processo."
+							/>
+						</Form.Item>
+					</Col>
+				</Row>
+			</Form>
 		</Drawer>
 	);
 };

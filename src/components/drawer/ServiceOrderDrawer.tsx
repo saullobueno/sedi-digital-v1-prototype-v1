@@ -158,9 +158,6 @@ const ServiceOrderDrawer: React.FC<ServiceOrderDrawerProps> = ({
 		<Drawer
 			title={selected ? `${selected.numeroFSP}` : "Ordem de Serviço"}
 			placement="right"
-			closable={{
-				placement: "end",
-			}}
 			width={1000}
 			open={open}
 			onClose={onClose}
@@ -180,6 +177,9 @@ const ServiceOrderDrawer: React.FC<ServiceOrderDrawerProps> = ({
 					</Button>
 				</Space>
 			}
+			closable={{
+				placement: "end",
+			}}
 		>
 			{/* Form único envolvendo tudo (Tabs + Drawers filhos) */}
 			<Form
