@@ -420,9 +420,9 @@ const itemsMainMenu: MenuProps['items'] = [
 
 	{ key: 22, label: "Financeiro", type: "group" },
 	{ key: 23, label: <Link to="/billing">Faturamento</Link>, icon: <FcMoneyTransfer className='text-lg me-2' /> },
-	{ key: 21, label: <Link to="/billed">Faturado</Link>, icon: <FcOk className='text-lg me-2' /> },
-	/* { key: 24, label: <Link to="/payable">Contas a Pagar</Link>, icon: <FcDebt className='text-lg me-2' /> },
-	{ key: 25, label: <Link to="/receivable">Contas a Receber</Link>, icon: <FcPositiveDynamic className='text-lg me-2' /> }, */
+	{ key: 21, label: <Link to="/billed">Faturados</Link>, icon: <FcOk className='text-lg me-2' /> },
+	{ key: 24, label: <Link to="/payable">Contas a Pagar</Link>, icon: <FcDebt className='text-lg me-2' /> },
+	/* { key: 25, label: <Link to="/receivable">Contas a Receber</Link>, icon: <FcPositiveDynamic className='text-lg me-2' /> }, */
 
 	/* { key: 6, label: "Marketing", type: "group" },
 	{ key: 7, label: <Link to="/campaigns">Campanhas</Link>, icon: <FcAdvertising className='text-lg me-2' /> },

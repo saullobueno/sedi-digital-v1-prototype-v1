@@ -84,7 +84,7 @@ function App() {
 										<Route path="/pending" element={<PendingList />} />
 										<Route path="/billing" element={<BillingList />} />
 										<Route path="/billed" element={<BilledList />} />
-										<Route path="/payable" element={<PayableList />} />
+										{/* <Route path="/payable" element={<PayableList />} /> */}
 										<Route path="/receivable" element={<ReceivableList />} />
 										<Route path="/humanresourcesdepartment" element={<HumanResourcesDepartmentList />} />
 										<Route path="/recruitment" element={<RecruitmentList />} />
